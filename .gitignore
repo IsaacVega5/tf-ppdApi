@@ -1,0 +1,32 @@
+# Entorno virtual
+.venv/
+env/
+venv/
+ 
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+ 
+# Archivos de configuraciones del IDE
+.vscode/
+.idea/
+ 
+# Dependencias
+Pipfile.lock
+poetry.lock
+ 
+# Archivos de bases de datos locales
+*.sqlite3
+ 
+# Archivos de logs
+*.log
+ 
+# Archivos de pruebas
+.pytest_cache/
+.tox/
+.coverage
+ 
+# Archivos de configuración local (si usas .env)
+.env
