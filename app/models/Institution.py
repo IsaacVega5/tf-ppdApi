@@ -7,7 +7,7 @@ if TYPE_CHECKING:
   from app.models import InstitutionType, UserInstitution
 
 class InstitutionBase(SQLModel):
-  institution_name: Optional[str] = Field(nullable=False)
+  institution_name: Optional[str] = Field(nullable=True)
   id_institution_type: Optional[int] = Field(default=None, foreign_key="institution_type.id_institution_type")
 
 class Institution(InstitutionBase, table=True):
