@@ -7,10 +7,15 @@ API para gestión de usuarios, instituciones y roles, construida con **FastAPI**
 
 ## 📌 Estado del Proyecto  
 ### **Historias de Usuario (Taiga)**  
-`HU-01`: Gestión de usuarios *(Completado)*  
-`HU-02`: Vinculación usuario-institución *(En progreso)*  
-`HU-03`: Tipos de instituciones *(Pendiente)*  
-🔗 *Tablero Taiga:* `[Enlace pendiente]`  
+`HU-01`: Dashboard
+`HU-02`: Registro de medidas  
+`HU-04`: Cálculos de KPI  
+`HU-03`: Generación de reportes  
+`HU-06`: Definición de dead lines  
+`HU-05`: Sistema de alertas de tiempo dead line
+
+
+🔗 *Tablero Taiga:* `https://tree.taiga.io/project/isaacvega-monitoreo-ambiental/backlog`  
 
 ---
 
@@ -59,22 +64,20 @@ Método  Ruta  Descripción  Estado
 
 ### 📚 Documentación API
 Accede a la interfaz interactiva:
-- 🔗 Swagger UI: http://localhost:8000/docs
--  🔗 Redoc: http://localhost:8000/redoc
+- 🔗 Swagger UI: https://tf-ppdapi.onrender.com/docs
+-  🔗 Redoc: https://tf-ppdapi.onrender.com/redoc
 
 Swagger Preview
 
 ### 🛠️ Tecnologías Clave
-Python 3.10+
-
-FastAPI (Framework API)
-
-SQLModel + Pydantic (ORM)
-Alembic (DB Migrations)
-
-PostgreSQL (Producción) / SQLite (Desarrollo)
-
-JWT (Próxima implementación)
+- Python 3.10+
+- FastAPI (Framework API)
+- SQLModel + Pydantic (ORM)
+- Alembic (DB Migrations)
+- PostgreSQL (Producción) / SQLite (Desarrollo)
+- Render (Despliegue)
+- Neon (Host de PostgreSQL)
+- JWT (Próxima implementación)
 
 ### ➡️ Próximos Pasos
 Implementar CRUD completo para instituciones
@@ -92,3 +95,4 @@ Documentar relaciones entre entidades
 | --- | --- |
 | HU (Taiga) | https://tree.taiga.io/project/isaacvega-monitoreo-ambiental/backloghttps://tree.taiga.io/project/isaacvega-monitoreo-ambiental/backlog  |
 | Modelo de datos | https://drive.google.com/file/d/1uAn58pCjgUSUlszfrvj2FbajfV92QorS/view?usp=drive_link |
+|api host | https://tf-ppdapi.onrender.com/ |
