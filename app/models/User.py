@@ -18,3 +18,8 @@ class User(UserBase, table=True):
   password : Optional[str] = Field(nullable=False)
   
   user_institution_user : list["UserInstitution"] = Relationship(back_populates="user")
+  
+class UserCreate(UserBase):
+  username: Optional[str]
+  email: str
+  password : str
