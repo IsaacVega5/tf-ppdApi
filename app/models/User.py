@@ -23,3 +23,7 @@ class UserCreate(UserBase):
   username: Optional[str]
   email: str
   password : str
+
+class UserLogin(UserBase):
+  email: str
+  password : str
