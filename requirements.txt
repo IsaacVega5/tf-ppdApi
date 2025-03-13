@@ -19,3 +19,5 @@ sqlmodel==0.0.22
 starlette==0.41.3
 typing_extensions==4.12.2
 uvicorn==0.34.0
+pytest==8.3.5
+httpx==0.28.1
