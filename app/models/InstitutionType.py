@@ -12,3 +12,9 @@ class InstitutionType(InstitutionTypeBase, table=True):
   id_institution_type : Optional[int] = Field(default=None, primary_key=True)
   
   institution : list["Institution"] = Relationship(back_populates="institution_type")
+  
+class InstitutionTypeCreate(InstitutionTypeBase):
+  institution_type : str
+
+class InstitutionTypeUpdate(SQLModel):
+  institution_type : Optional[str]

@@ -3,7 +3,7 @@ from fastapi.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from app.routes import User
+from app.routes import InstitutionType, User
 
 load_dotenv()
 
@@ -24,6 +24,7 @@ middleware = [
 app = FastAPI(middleware=middleware)
 
 app.include_router(User.router)
+app.include_router(InstitutionType.router)
 
 @app.get("/")
 async def root():
