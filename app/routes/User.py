@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.db import get_session
 from app.models.User import User, UserCreate, UserLogin
@@ -7,7 +7,7 @@ from app.controllers import UserController
 router = APIRouter(
   prefix="/user",
   tags=["user"],
-  responses={404: {"description": "Not found"}}
+  responses={status.HTTP_404_NOT_FOUND: {"description": "Not found"}}
 )
 
 @router.get("/")
@@ -19,7 +19,7 @@ async def get_users(session = Depends(get_session), request : Request = None):
 async def get_user(id, session = Depends(get_session)):
   user = UserController.get_by_id(id, session)
   if not user:
-    return HTTPException(status_code=404, detail="User not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
   return user
 
 @router.delete("/{id}")
