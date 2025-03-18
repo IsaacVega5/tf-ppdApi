@@ -1,9 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
 
 from app.db import get_session
 from app.models.User import User, UserCreate, UserLogin
 from app.controllers import UserController
 
+limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(
   prefix="/user",
   tags=["user"],
