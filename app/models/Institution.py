@@ -18,10 +18,10 @@ class Institution(InstitutionBase, table=True):
   institution_type : Optional["InstitutionType"] = Relationship(back_populates="institution")
   user_institution_institution : list["UserInstitution"] = Relationship(back_populates="institution_user_institution")
 
-class IntitutionCreate(InstitutionBase):
+class InstitutionCreate(InstitutionBase):
   institution_name: str
   id_institution_type: int
 
-class IntitutionUpdate(InstitutionBase):
+class InstitutionUpdate(InstitutionBase):
   institution_name: Optional[str] = None
   id_institution_type: Optional[int] = None

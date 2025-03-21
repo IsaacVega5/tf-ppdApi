@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.controllers import InstitutionController, InstitutionTypeController
 from app.db import get_session
-from app.models.Institution import Institution, IntitutionCreate, IntitutionUpdate
+from app.models.Institution import Institution, InstitutionCreate, InstitutionUpdate
 
 
 router = APIRouter(
@@ -28,7 +28,7 @@ async def get_institution(id : str, session = Depends(get_session)):
   return institution
 
 @router.post("/", description="Create a new institution", response_model=Institution)
-async def create_institution(institution: IntitutionCreate, session = Depends(get_session)):
+async def create_institution(institution: InstitutionCreate, session = Depends(get_session)):
   intitution_type = InstitutionTypeController.get_by_id(institution.id_institution_type, session)
   if not intitution_type:
     raise HTTPException(
@@ -43,7 +43,7 @@ async def delete_institution(id: str, session = Depends(get_session)):
   return await InstitutionController.delete_institution(id, session)
 
 @router.put("/{id}", description="Update an institution", response_model=Institution)
-async def update_institution(id: str, institution: IntitutionUpdate, session = Depends(get_session)):
+async def update_institution(id: str, institution: InstitutionUpdate, session = Depends(get_session)):
   current_institution = await InstitutionController.get_by_id(id, session)
   if not current_institution:
     raise HTTPException(

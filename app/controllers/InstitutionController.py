@@ -1,6 +1,6 @@
 import sqlmodel as sql
 
-from app.models import Institution, IntitutionCreate, IntitutionUpdate
+from app.models import Institution, InstitutionCreate, InstitutionUpdate
 
 async def get_all(session : sql.Session):
   statement = sql.select(Institution)
@@ -13,7 +13,7 @@ async def get_by_id(id:str, session : sql.Session):
   institution = session.exec(statement).first()
   return institution
 
-async def create_institution(institution: IntitutionCreate, session : sql.Session):
+async def create_institution(institution: InstitutionCreate, session : sql.Session):
   new_institution = Institution.model_validate(institution)
   session.add(new_institution)
   session.commit()
@@ -25,7 +25,7 @@ async def delete_institution(id: str, session : sql.Session):
   session.commit()
   return {"message": "Institution deleted"}
 
-async def update_institution(id: str, institution: IntitutionUpdate, session : sql.Session):
+async def update_institution(id: str, institution: InstitutionUpdate, session : sql.Session):
   changes = institution.model_dump(exclude_unset=True)
   if not changes:
     return await get_by_id(id, session)
