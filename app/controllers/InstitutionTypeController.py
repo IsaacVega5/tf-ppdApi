@@ -1,35 +1,62 @@
-from fastapi import HTTPException
-from sqlmodel import Session
-
-import sqlmodel as sql
+from fastapi import HTTPException, status
+from sqlmodel import Session, select
 
 from app.models import InstitutionType, InstitutionTypeCreate
 
-def get_all(session : Session):
-  statement = sql.select(InstitutionType)
-  institution_types = session.exec(statement).all()
-  return institution_types
+def get_all(session: Session):
+    return session.exec(select(InstitutionType)).all()
 
-def get_by_id(id: int, session : Session):
-  statement = sql.select(InstitutionType).where(InstitutionType.id_institution_type == id)
-  institution_type = session.exec(statement).first()
-  return institution_type
+def get_by_id(id: int, session: Session):
+    institution = session.get(InstitutionType, id)
+    if not institution:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Institution type not found"
+        )
+    return institution
 
-def create_institution_type(institution_type: InstitutionTypeCreate, session : Session):
-  new_institution_type = InstitutionType.model_validate(institution_type)
-  session.add(new_institution_type)
-  session.commit()
-  session.refresh(new_institution_type)
-  return new_institution_type
+def create_institution_type(institution_type: InstitutionTypeCreate, session: Session):
+    # Validación del nombre
+    if not institution_type.institution_type.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Institution type name cannot be empty"
+        )
+    
+    db_institution = InstitutionType.model_validate(institution_type)
+    session.add(db_institution)
+    session.commit()
+    session.refresh(db_institution)
+    return db_institution
 
-def delete_institution_type(id: str, session : Session):
-  statement = sql.delete(InstitutionType).where(InstitutionType.id_institution_type == id)
-  session.exec(statement)
-  session.commit()
-  return {"message": "Institution type deleted"}
+def delete_institution_type(id: int, session: Session):
+    institution = session.get(InstitutionType, id)
+    if not institution:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Institution type not found"
+        )
+    
+    session.delete(institution)
+    session.commit()
+    return {"message": f"Institution type {id} deleted"}
 
-def update_institution_type(id: str, institution_type: InstitutionTypeCreate, session : Session):
-  statement = sql.update(InstitutionType).where(InstitutionType.id_institution_type == id).values(institution_type.model_dump())
-  session.exec(statement)
-  session.commit()
-  return get_by_id(id, session)
+def update_institution_type(id: int, institution_type: InstitutionTypeCreate, session: Session):
+    if not institution_type.institution_type.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Institution type name cannot be empty"
+        )
+    
+    db_institution = session.get(InstitutionType, id)
+    if not db_institution:
+        raise HTTPException(status_code=404, detail="Institution type not found")
+    
+    institution_data = institution_type.model_dump(exclude_unset=True)
+    for key, value in institution_data.items():
+        setattr(db_institution, key, value)
+    
+    session.add(db_institution)
+    session.commit()
+    session.refresh(db_institution)
+    return db_institution
