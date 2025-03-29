@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlmodel import Session
-import hashlib
+from app.utils.auth import get_password_hash, verify_password
 
 import sqlmodel as sql
 
@@ -8,7 +8,7 @@ from app.models.User import UserCreate, User, UserLogin
 
 
 def create_user(user: UserCreate, session : Session):
-  user.password = hashlib.sha256(user.password.encode()).hexdigest()
+  user.password = get_password_hash(user.password)
   
   new_user = User.model_validate(user)
   session.add(new_user)
@@ -28,13 +28,12 @@ def get_by_id(id: int, session : Session):
 
 def login(user: UserLogin, session : Session):
   #TODO: Use JWT
-  user.password = hashlib.sha256(user.password.encode()).hexdigest()
-  statement = sql.select(User).where(User.email == user.email).where(User.password == user.password)
-  user = session.exec(statement).first()
-  if not user:
-    return HTTPException(status_code=404, detail="User not found")
+  statement = sql.select(User).where(User.email == user.email)
+  db_user = session.exec(statement).first()
+  if not db_user or not verify_password(user.password, db_user.password):
+     raise HTTPException(status_code=401, detail="Ivalid user or password")
   
-  return user
+  return db_user
 
 def delete_user(id: str, session : Session):
   statement = sql.delete(User).where(User.id_user == id)
