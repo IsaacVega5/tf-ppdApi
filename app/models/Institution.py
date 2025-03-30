@@ -5,7 +5,7 @@ import uuid
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
-  from app.models import InstitutionType, UserInstitution
+  from app.models import InstitutionType, UserInstitution, Ppda
 
 class InstitutionBase(SQLModel):
   institution_name: Optional[str] = Field(nullable=True)
@@ -18,7 +18,8 @@ class Institution(InstitutionBase, table=True):
   
   institution_type : Optional["InstitutionType"] = Relationship(back_populates="institution")
   user_institution_institution : list["UserInstitution"] = Relationship(back_populates="institution_user_institution")
-
+  ppda : Optional["Ppda"] = Relationship(back_populates="institutions")
+  
 class InstitutionCreate(InstitutionBase):
   institution_name: str
   id_institution_type: int
