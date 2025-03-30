@@ -1,5 +1,6 @@
 
 from typing import TYPE_CHECKING, Optional
+from pydantic import field_validator
 import uuid
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -21,6 +22,12 @@ class Institution(InstitutionBase, table=True):
 class InstitutionCreate(InstitutionBase):
   institution_name: str
   id_institution_type: int
+
+  @field_validator('institution_name')
+  def name_must_not_be_empty(cls, v):
+    if not v or not v.strip():
+      raise ValueError("The institution name must not be empty")
+    return v.strip()
 
 class InstitutionUpdate(InstitutionBase):
   institution_name: Optional[str] = None
