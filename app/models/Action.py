@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Optional
 from sqlmodel import Relationship, SQLModel, Field
 
 if TYPE_CHECKING: 
-  from app.models import ActionType, Ppda
+  from app.models import ActionType, Ppda, DeadLine
   
 class ActionBase(SQLModel):
   id_ppda : Optional[str] = Field(default=None, foreign_key="ppda.id_ppda")
@@ -15,3 +15,4 @@ class Action(ActionBase, table=True):
  
   action_type : Optional["ActionType"] = Relationship(back_populates="action") 
   ppda : Optional["Ppda"] = Relationship(back_populates="actions")
+  deadlines : list["DeadLine"] = Relationship(back_populates="action")

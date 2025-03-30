@@ -6,3 +6,6 @@ from .UserRol import *
 from .ActionType import *
 from .Action import *
 from .Ppda import *
+from .Message import *
+from .PriorityType import *
+from .DeadLine import *
