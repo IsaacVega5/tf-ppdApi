@@ -42,7 +42,7 @@ def login(user: UserLogin, session : Session):
   statement = sql.select(User).where(User.email == user.email)
   db_user = session.exec(statement).first()
   if not db_user or not verify_password(user.password, db_user.password):
-     raise HTTPException(status_code=401, detail="Ivalid user or password")
+     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid user or password")
   
   return db_user
 
