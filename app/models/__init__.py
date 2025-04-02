@@ -9,3 +9,7 @@ from .Ppda import *
 from .Message import *
 from .PriorityType import *
 from .DeadLine import *
+from .Kpi import *
+from .Variable import *
+from .Report import *
+from .History import *

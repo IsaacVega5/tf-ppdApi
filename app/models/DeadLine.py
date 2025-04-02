@@ -6,7 +6,7 @@ if TYPE_CHECKING: from app.models import Action, Message
 
 class DeadLineBase(SQLModel):
   deadline_date: Optional[str] = Field(nullable=False)
-  id_action : Optional[int] = Field(default=None, foreign_key="action.id_action")
+  id_action : Optional[str] = Field(default=None, foreign_key="action.id_action")
   year : Optional[int] = Field(default=None)
   
 class DeadLine(DeadLineBase, table=True):
