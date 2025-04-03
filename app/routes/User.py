@@ -7,7 +7,7 @@ from typing import Annotated
 from app.db import get_session
 from app.models.User import User, UserCreate
 from app.controllers import UserController
-from app.utils.auth import get_current_user, verify_token
+from app.utils.auth import get_current_user, verify_access_token
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(
@@ -26,7 +26,7 @@ async def get_users(session = Depends(get_session)):
 async def get_user_me(current_user : Annotated[User, Depends(get_current_user)]):
   return current_user
 
-@router.get("/{id}", dependencies=[Depends(verify_token)])
+@router.get("/{id}", dependencies=[Depends(verify_access_token)])
 async def get_user(id, session = Depends(get_session)):
   user = UserController.get_by_id(id, session)
   if not user:

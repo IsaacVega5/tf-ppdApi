@@ -38,7 +38,7 @@ def generate_access_token(data: dict, expires_delta: timedelta | None = None):
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=access_token_expire_minutes)
     
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "token_type": "access"})
     encoded_jwt = jwt.encode(
         payload=to_encode,
         key=secret_key,
@@ -50,7 +50,7 @@ def generate_access_token(data: dict, expires_delta: timedelta | None = None):
 def generate_refresh_token(data: dict):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=refresh_token_expire_days)
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "token_type": "refresh"})
     encoded_jwt = jwt.encode(
         payload=to_encode,
         key=secret_key,
@@ -58,7 +58,8 @@ def generate_refresh_token(data: dict):
     )
     return encoded_jwt
 
-async def verify_token(token: Annotated[str, Depends(oauth2_scheme)]):
+async def verify_token_type(token: Annotated[str, Depends(oauth2_scheme)], token_type: str):
+    # TODO: valdrá la pena validar que token_type sea access o refresh, y qué error arrojaría si no.
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials"
@@ -69,9 +70,17 @@ async def verify_token(token: Annotated[str, Depends(oauth2_scheme)]):
             secret_key,
             algorithms=[algorithm]
         )
+        if payload.get("token_type") != token_type:
+            raise credentials_exception
     except InvalidTokenError:
         raise credentials_exception
     return payload
+
+async def verify_access_token(token: Annotated[str, Depends(oauth2_scheme)]):
+    return await verify_token_type(token=token, token_type="access")
+
+async def verify_refresh_token(token: Annotated[str, Depends(oauth2_scheme)]):
+    return await verify_token_type(token=token, token_type="refresh")
 
 
 async def get_current_user(
@@ -83,7 +92,7 @@ async def get_current_user(
         detail="Could not validate credentials"
     )
 
-    payload = await verify_token(token)
+    payload = await verify_access_token(token)
     username = payload.get("sub")
     if username is None:
         raise credentials_exception
