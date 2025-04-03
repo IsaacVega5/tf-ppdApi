@@ -8,7 +8,7 @@ from app.models.User import UserCreate, User, UserLogin
 
 def create_user(user: UserCreate, session: Session):
     """
-    Creates a new user in the database after validating email uniqueness.
+    Creates a new user.
     
     Args:
         user (UserCreate): User data including email and plain text password.
