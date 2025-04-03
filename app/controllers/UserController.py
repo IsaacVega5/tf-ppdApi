@@ -1,10 +1,10 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session
-import hashlib
+from app.utils.auth import get_password_hash, verify_password
 
 import sqlmodel as sql
 
-from app.models.User import UserCreate, User, UserLogin
+from app.models.User import UserCreate, User
 
 def create_user(user: UserCreate, session: Session):
     # Primero verificar si el email ya existe
@@ -19,7 +19,7 @@ def create_user(user: UserCreate, session: Session):
         )
     
     # Hash de la contraseña
-    user.password = hashlib.sha256(user.password.encode()).hexdigest()
+    user.password = get_password_hash(user.password)
     
     new_user = User.model_validate(user)
     session.add(new_user)
@@ -37,13 +37,9 @@ def get_by_id(id: int, session : Session):
   user = session.exec(statement).first()
   return user
 
-def login(user: UserLogin, session : Session):
-  #TODO: Use JWT
-  user.password = hashlib.sha256(user.password.encode()).hexdigest()
-  statement = sql.select(User).where(User.email == user.email).where(User.password == user.password)
+def get_by_username(username: str, session : Session):
+  statement = sql.select(User).where(User.username == username)
   user = session.exec(statement).first()
-  if not user:
-    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
   return user
 
 def delete_user(id: str, session: Session):
