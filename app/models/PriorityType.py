@@ -10,6 +10,6 @@ class PriorityType(PriorityTypeBase, table=True):
   __tablename__ = "priority_type"
   id_priority_type: Optional[int] = Field(default=None, primary_key=True)
   
-  messages : Optional["Message"] = Relationship(back_populates="priority_type")
+  messages : list["Message"] = Relationship(back_populates="priority_type")
   
   

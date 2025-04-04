@@ -18,7 +18,7 @@ class Institution(InstitutionBase, table=True):
   
   institution_type : Optional["InstitutionType"] = Relationship(back_populates="institution")
   user_institution_institution : list["UserInstitution"] = Relationship(back_populates="institution_user_institution")
-  ppda : Optional["Ppda"] = Relationship(back_populates="institutions")
+  ppda_list : list["Ppda"] = Relationship(back_populates="institution")
   
 class InstitutionCreate(InstitutionBase):
   institution_name: str

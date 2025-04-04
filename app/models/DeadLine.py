@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 import uuid
 from sqlmodel import Field, Relationship, SQLModel
@@ -5,7 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel
 if TYPE_CHECKING: from app.models import Action, Message
 
 class DeadLineBase(SQLModel):
-  deadline_date: Optional[str] = Field(nullable=False)
+  deadline_date: Optional[datetime] = Field(nullable=False)
   id_action : Optional[str] = Field(default=None, foreign_key="action.id_action")
   year : Optional[int] = Field(default=None)
   

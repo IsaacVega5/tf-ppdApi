@@ -12,4 +12,4 @@ class Ppda(PpdaBase, table=True):
   id_ppda: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, unique=True)
   
   actions : list["Action"] = Relationship(back_populates="ppda")
-  institutions : list["Institution"] = Relationship(back_populates="ppda")
+  institution : Optional["Institution"] = Relationship(back_populates="ppda_list")
