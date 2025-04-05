@@ -57,5 +57,5 @@ class UserLogin(UserBase):
       email (str): User's email address.
       password (str): Plain text password for authentication.
   """
-  email: str
+  username: str
   password : str

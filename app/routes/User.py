@@ -3,10 +3,12 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from typing import List
 
+from typing import Annotated
 
 from app.db import get_session
-from app.models.User import User, UserCreate, UserLogin
+from app.models.User import User, UserCreate
 from app.controllers import UserController
+from app.utils.auth import get_current_user, verify_access_token
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(
@@ -30,7 +32,7 @@ router = APIRouter(
             """,
             response_description="List of all users"
             )
-async def get_users(session = Depends(get_session), request : Request = None):
+async def get_users(session = Depends(get_session)):
   """
   Get all users.
   
@@ -40,7 +42,11 @@ async def get_users(session = Depends(get_session), request : Request = None):
   users = UserController.get_all(session)
   return users
 
-@router.get("/{id}", 
+@router.get("/me")
+async def get_user_me(current_user : Annotated[User, Depends(get_current_user)]):
+  return current_user
+
+@router.get("/{id}", dependencies=[Depends(verify_access_token)], 
             response_model=User,
             summary="Get user by ID",
             description="""Retrieves details of a specific user.
@@ -114,25 +120,3 @@ async def post_user(user: UserCreate, session = Depends(get_session)):
       User: The newly created user's data.
   """
   return UserController.create_user(user, session)
-
-@router.post("/login",
-              response_model=User,
-              summary="Authenticate user",
-              description="""Validates user credentials and returns profile.
-
-              Returns:
-                  Authenticated user profile
-              """,
-              response_description="Authentication result"
-            )
-async def login(user: UserLogin, session = Depends(get_session)):
-  """
-  Authenticate a user.
-  
-  Args:
-      user (UserLogin): User credentials (email and password).
-  
-  Returns:
-      User: Authenticated user's data.
-  """
-  return UserController.login(user, session)
