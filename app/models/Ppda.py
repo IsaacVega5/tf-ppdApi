@@ -13,3 +13,9 @@ class Ppda(PpdaBase, table=True):
   
   actions : list["Action"] = Relationship(back_populates="ppda")
   institution : Optional["Institution"] = Relationship(back_populates="ppda_list")
+  
+class PpdaCreate(PpdaBase):
+  id_institution: Optional[str]
+
+class PpdaUpdate(PpdaBase):
+  id_institution: Optional[str]
