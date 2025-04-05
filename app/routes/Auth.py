@@ -5,6 +5,9 @@ from app.db import get_session
 
 from app.models.User import UserLogin
 from app.controllers import AuthController
+from typing import Annotated
+from app.utils.auth import get_refresh_username
+
 
 
 router = APIRouter(
@@ -18,8 +21,11 @@ async def login_for_token(user: UserLogin, session = Depends(get_session)):
     return AuthController.login(user, session)
 
 @router.post("/refresh-token")
-async def refresh_token(user: UserLogin, session = Depends(get_session)):
-    return AuthController.refresh_token(user, session)
+async def refresh_token(
+    username : Annotated[str, Depends(get_refresh_username)],
+    session = Depends(get_session)
+):
+    return AuthController.refresh_token(username, session)
 
 # async def expire_token():
 #     pass

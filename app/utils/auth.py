@@ -58,7 +58,7 @@ def generate_refresh_token(data: dict):
     )
     return encoded_jwt
 
-async def verify_token_type(token: Annotated[str, Depends(oauth2_scheme)], token_type: str):
+async def verify_token_by_type(token: Annotated[str, Depends(oauth2_scheme)], token_type: str):
     # TODO: valdrá la pena validar que token_type sea access o refresh, y qué error arrojaría si no.
     credentials_exception = HTTPException(
         status_code=401,
@@ -77,11 +77,10 @@ async def verify_token_type(token: Annotated[str, Depends(oauth2_scheme)], token
     return payload
 
 async def verify_access_token(token: Annotated[str, Depends(oauth2_scheme)]):
-    return await verify_token_type(token=token, token_type="access")
+    return await verify_token_by_type(token=token, token_type="access")
 
 async def verify_refresh_token(token: Annotated[str, Depends(oauth2_scheme)]):
-    return await verify_token_type(token=token, token_type="refresh")
-
+    return await verify_token_by_type(token=token, token_type="refresh")
 
 async def get_current_user(
         token: Annotated[str, Depends(oauth2_scheme)],
@@ -92,7 +91,7 @@ async def get_current_user(
         detail="Could not validate credentials"
     )
 
-    payload = await verify_access_token(token)
+    payload = await verify_access_token(token=token)
     username = payload.get("sub")
     if username is None:
         raise credentials_exception
@@ -104,6 +103,18 @@ async def get_current_user(
         raise credentials_exception
     return user
 
+async def get_refresh_username(token: Annotated[str, Depends(oauth2_scheme)]):    
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials"
+    )
+
+    payload = await verify_refresh_token(token)
+    username = payload.get("sub")
+    if username is None:
+        raise credentials_exception
+    
+    return username
 
 # async def get_current_active_user(
 #         current_user: Annotated[User, Depends(get_current_user)]
