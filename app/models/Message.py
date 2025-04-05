@@ -12,7 +12,7 @@ class MessageBase(SQLModel):
   
 class Message(MessageBase, table=True):
   __tablename__ = "message"
-  id_message: Optional[int] = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, unique=True)
+  id_message: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, unique=True)
   
   priority_type : Optional["PriorityType"] = Relationship(back_populates="messages")
   deadline : Optional["DeadLine"] = Relationship(back_populates="deadline_messages")
