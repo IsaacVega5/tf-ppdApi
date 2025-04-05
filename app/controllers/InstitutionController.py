@@ -5,18 +5,51 @@ from sqlalchemy.exc import IntegrityError
 from app.models import Institution, InstitutionCreate, InstitutionUpdate
 
 async def get_all(session : sql.Session):
-  statement = sql.select(Institution)
-  institutions = session.exec(statement).all()
-  return institutions
+    """
+        Retrieve all institutions from the database.
+
+        Args:
+        session (sql.Session): Database session for operations.
+
+        Returns:
+            List[Institution]: List of all institution objects.
+    """
+    statement = sql.select(Institution)
+    institutions = session.exec(statement).all()
+    return institutions
 
 async def get_by_id(id:str, session : sql.Session):
-  statement = sql.select(Institution).\
-    where(Institution.id_institution == id)
-  institution = session.exec(statement).first()
-  return institution
+    """
+    Get a single institution by its ID.
+    
+    Args:
+        id (str): The UUID of the institution to retrieve.
+        session (sql.Session): Database session for operations.
+    
+    Returns:
+        Institution | None: The requested institution or None if not found.
+    """
+    statement = sql.select(Institution).\
+        where(Institution.id_institution == id)
+    institution = session.exec(statement).first()
+    return institution
 
 async def create_institution(institution: InstitutionCreate, session: sql.Session):
-    # Verificar si ya existe una institución con el mismo nombre y tipo
+    """
+    Create a new institution.
+    
+    Args:
+        institution (InstitutionCreate): Institution data to create.
+        session (sql.Session): Database session for operations.
+    
+    Returns:
+        Institution: The newly created institution.
+    
+    Raises:
+        HTTPException: 409 if institution with same name/type exists.
+        HTTPException: 404 if institution type doesn't exist.
+        HTTPException: 500 for database integrity errors.
+    """
     from app.models import InstitutionType  # Importar aquí para evitar circular imports
     try:
         # Verificar si ya existe una institución con el mismo nombre y tipo
@@ -61,6 +94,21 @@ async def create_institution(institution: InstitutionCreate, session: sql.Sessio
         ) from e
 
 async def delete_institution(id: str, session: sql.Session):
+    """
+    Delete an institution by ID.
+    
+    Args:
+        id (str): The UUID of the institution to delete.
+        session (sql.Session): Database session for operations.
+    
+    Returns:
+        dict: Success message and deleted institution data.
+    
+    Raises:
+        HTTPException: 404 if institution not found.
+        HTTPException: 400 if institution has associated users.
+        HTTPException: 500 for database errors.
+    """
     # Verificar si la institución existe
     institution = await get_by_id(id, session)
     if not institution:
@@ -90,6 +138,22 @@ async def delete_institution(id: str, session: sql.Session):
 
 
 async def update_institution(id: str, institution: InstitutionUpdate, session: sql.Session):
+    """
+    Update an institution.
+    
+    Args:
+        id (str): The UUID of the institution to update.
+        institution (InstitutionUpdate): Partial/full institution data to update.
+        session (sql.Session): Database session for operations.
+    
+    Returns:
+        Institution: The updated institution data.
+    
+    Raises:
+        HTTPException: 404 if institution or type not found.
+        HTTPException: 409 if name/type combination exists.
+        HTTPException: 500 for database errors.
+    """
     # Verificar si la institución existe
     existing = await get_by_id(id, session)
     if not existing:
