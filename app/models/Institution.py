@@ -5,7 +5,7 @@ import uuid
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
-  from app.models import InstitutionType, UserInstitution
+  from app.models import InstitutionType, UserInstitution, Ppda
 
 class InstitutionBase(SQLModel):
   """
@@ -33,7 +33,8 @@ class Institution(InstitutionBase, table=True):
   
   institution_type : Optional["InstitutionType"] = Relationship(back_populates="institution")
   user_institution_institution : list["UserInstitution"] = Relationship(back_populates="institution_user_institution")
-
+  ppda_list : list["Ppda"] = Relationship(back_populates="institution")
+  
 class InstitutionCreate(InstitutionBase):
   """
   Model for creating new institutions with validation.

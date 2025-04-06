@@ -3,3 +3,13 @@ from .UserInstitution import *
 from .Institution import *
 from .InstitutionType import *
 from .UserRol import *
+from .ActionType import *
+from .Action import *
+from .Ppda import *
+from .Message import *
+from .PriorityType import *
+from .DeadLine import *
+from .Kpi import *
+from .Variable import *
+from .Report import *
+from .History import *
