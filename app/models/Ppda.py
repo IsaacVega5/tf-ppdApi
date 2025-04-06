@@ -27,3 +27,24 @@ class Ppda(PpdaBase, table=True):
     
     actions : list["Action"] = Relationship(back_populates="ppda")
     institution : Optional["Institution"] = Relationship(back_populates="ppda_list")
+
+class PpdaCreate(PpdaBase):
+    """Model for creating a new PPDA (Plan de Prevención y Descontaminación Atmosférica).
+    
+    Inherits from PpdaBase and is used for creating new PPDA instances.
+    
+    Attributes:
+        id_institution (str): Foreign key referencing the institution this PPDA belongs to
+    """
+    id_institution: Optional[str]
+
+
+class PpdaUpdate(PpdaBase):
+    """Model for updating an existing PPDA (Plan de Prevención y Descontaminación Atmosférica).
+    
+    Inherits from PpdaBase and is used for updating existing PPDA instances.
+    
+    Attributes:
+        id_institution (str): Foreign key referencing the institution this PPDA belongs to
+    """
+    id_institution: Optional[str]
