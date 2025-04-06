@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session
-from app.utils.auth import get_password_hash, verify_password
+from app.utils.auth import get_hash
 
 import sqlmodel as sql
 
@@ -31,7 +31,7 @@ def create_user(user: UserCreate, session: Session):
         )
     
     # Hash de la contraseña
-    user.password = get_password_hash(user.password)
+    user.password = get_hash(user.password)
     
     new_user = User.model_validate(user)
     session.add(new_user)
