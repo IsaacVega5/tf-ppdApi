@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 import sqlmodel as sql
 from app.models.Ppda import Ppda, PpdaCreate, PpdaUpdate
 
@@ -60,6 +61,9 @@ async def update_ppda(ppda: Ppda, session: sql.Session):
   Returns:
       Ppda: The updated ppda object.
   """
+  db_ppda = await get_by_id(ppda.id_ppda, session)
+  if not db_ppda:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ppda not found")
   statement = sql.select(Ppda).\
       where(Ppda.id_ppda == ppda.id_ppda)
   existing_ppda = session.exec(statement).first()
@@ -79,6 +83,9 @@ async def delete_ppda(id: str, session: sql.Session):
   Returns:
       dict: Confirmation message.
   """
+  db_ppda = await get_by_id(id, session)
+  if not db_ppda:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ppda not found")
   statement = sql.select(Ppda).\
       where(Ppda.id_ppda == id)
   ppda = session.exec(statement).first()
