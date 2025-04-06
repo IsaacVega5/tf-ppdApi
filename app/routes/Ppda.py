@@ -25,7 +25,7 @@ router = APIRouter(
             description="""Retrieves a list of all registered ppda in the system.
             
             Returns:
-                List of User objects with sensitive fields omitted
+                List of Ppda objects with sensitive fields omitted
             """,
             response_description="List of all ppda"
             )
@@ -34,7 +34,7 @@ async def get_ppda(session = Depends(get_session)):
   Get all ppda.
   
   Returns:
-      List[User]: A list of all registered ppda.
+      List[Ppda]: A list of all registered ppda.
   """
   ppda = await PpdaController.get_all(session)
   return ppda
