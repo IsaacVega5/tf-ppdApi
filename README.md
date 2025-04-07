@@ -54,19 +54,8 @@ uvicorn app.main:app --reload
 Run Tests:
 
 ```	bash
-pytest
+python -m pytest
 ```	
-
-### 📡 Endpoints Implementados
-- Usuarios (/user)
-
-Método  Ruta  Descripción  Estado
-
-- GET  /  Listar todos los usuarios  ✅ Funcional
-- GET  /{id_user}  Obtener usuario por UUID  ✅ Funcional
-- Instituciones (/institution)
-  
-[EN CONSTRUCCIÓN] (Próxima entrega)
 
 ### 📚 Documentación API
 Accede a la interfaz interactiva:
@@ -86,14 +75,12 @@ Swagger Preview
 - JWT (Próxima implementación)
 
 ### ➡️ Próximos Pasos
-Implementar CRUD completo para instituciones
 
-Añadir autenticación JWT
+Actualizar y extender cobertura de tests
+
+Implementación de roles por institución
 
 Configurar despliegue en Docker
-
-Documentar relaciones entre entidades
-
 
 ### 🔗 Enlaces externos
 
