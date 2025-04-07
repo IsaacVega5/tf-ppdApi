@@ -3,15 +3,18 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from typing import List
 
+from typing import Annotated
 
 from app.db import get_session
-from app.models.User import User, UserCreate, UserLogin
+from app.models.User import User, UserCreate
 from app.controllers import UserController
+from app.utils.auth import get_current_user, get_admin_user
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(
   prefix="/user",
   tags=["user"],
+  dependencies=[Depends(get_admin_user)],
   responses={
     status.HTTP_404_NOT_FOUND: {"description": "User not found"},
     status.HTTP_429_TOO_MANY_REQUESTS: {"description": "Rate limit exceeded"},
@@ -30,7 +33,7 @@ router = APIRouter(
             """,
             response_description="List of all users"
             )
-async def get_users(session = Depends(get_session), request : Request = None):
+async def get_users(session = Depends(get_session)):
   """
   Get all users.
   
@@ -39,6 +42,10 @@ async def get_users(session = Depends(get_session), request : Request = None):
   """
   users = UserController.get_all(session)
   return users
+
+@router.get("/me", dependencies=[])
+async def get_user_me(current_user : Annotated[User, Depends(get_current_user)]):
+  return current_user
 
 @router.get("/{id}", 
             response_model=User,
@@ -114,25 +121,3 @@ async def post_user(user: UserCreate, session = Depends(get_session)):
       User: The newly created user's data.
   """
   return UserController.create_user(user, session)
-
-@router.post("/login",
-              response_model=User,
-              summary="Authenticate user",
-              description="""Validates user credentials and returns profile.
-
-              Returns:
-                  Authenticated user profile
-              """,
-              response_description="Authentication result"
-            )
-async def login(user: UserLogin, session = Depends(get_session)):
-  """
-  Authenticate a user.
-  
-  Args:
-      user (UserLogin): User credentials (email and password).
-  
-  Returns:
-      User: Authenticated user's data.
-  """
-  return UserController.login(user, session)

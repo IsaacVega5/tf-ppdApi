@@ -6,11 +6,13 @@ from typing import List
 from app.db import get_session
 from app.models import Ppda, PpdaCreate, PpdaUpdate
 from app.controllers import InstitutionController, PpdaController
+from app.utils.auth import verify_access_token
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(
   prefix="/ppda",
   tags=["ppda"],
+  dependencies=[Depends(verify_access_token)],
   responses={
     status.HTTP_404_NOT_FOUND: {"description": "Ppda not found"},
     status.HTTP_429_TOO_MANY_REQUESTS: {"description": "Rate limit exceeded"},

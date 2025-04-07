@@ -4,11 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.controllers import InstitutionController, InstitutionTypeController
 from app.db import get_session
 from app.models.Institution import Institution, InstitutionCreate, InstitutionUpdate
-
+from app.utils.auth import get_admin_user
 
 router = APIRouter(
   prefix="/institution",
   tags=["institution"],
+  dependencies=[Depends(get_admin_user)],
   responses={status.HTTP_404_NOT_FOUND: {"description": "Not found"}}
 )
 

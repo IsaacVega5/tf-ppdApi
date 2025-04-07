@@ -9,9 +9,9 @@ router = APIRouter(
   prefix="/institution-type",
   tags=["institution-type"],
   responses={
-    404: {"description": "Institution type not found"},
-    400: {"description": "Invalid request data"},
-    409: {"description": "Conflict with existing data"}
+    status.HTTP_404_NOT_FOUND: {"description": "Institution type not found"},
+    status.HTTP_400_BAD_REQUEST: {"description": "Invalid request data"},
+    status.HTTP_409_CONFLICT: {"description": "Conflict with existing data"}
   }
 )
 

@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING, Optional
 import uuid
 from sqlmodel import Relationship, SQLModel, Field
 
-if TYPE_CHECKING: from app.models import UserInstitution
+if TYPE_CHECKING:
+  from app.models import UserInstitution, RefreshToken
 
 class UserBase(SQLModel):
   """
@@ -19,7 +20,8 @@ class UserBase(SQLModel):
   email: Optional[str] = Field(nullable=False, default=None)
   created_at : int = Field(nullable=True, default_factory=lambda: int(datetime.datetime.now(datetime.timezone.utc).timestamp()))
   updated_at : int = Field(nullable=True, default_factory=lambda: int(datetime.datetime.now(datetime.timezone.utc).timestamp()), sa_column_kwargs={"onupdate": int(datetime.datetime.now(datetime.timezone.utc).timestamp())})
-  
+  is_admin: bool = Field(default=False)
+
 class User(UserBase, table=True):
   """
   Database model for User with authentication fields.
@@ -35,6 +37,7 @@ class User(UserBase, table=True):
   password : Optional[str] = Field(nullable=False)
   
   user_institution_user : list["UserInstitution"] = Relationship(back_populates="user")
+  refresh_token: list["RefreshToken"] = Relationship(back_populates="user")
   
 class UserCreate(UserBase):
   """
@@ -57,5 +60,5 @@ class UserLogin(UserBase):
       email (str): User's email address.
       password (str): Plain text password for authentication.
   """
-  email: str
+  username: str
   password : str
