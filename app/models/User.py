@@ -20,7 +20,8 @@ class UserBase(SQLModel):
   email: Optional[str] = Field(nullable=False, default=None)
   created_at : int = Field(nullable=True, default_factory=lambda: int(datetime.datetime.now(datetime.timezone.utc).timestamp()))
   updated_at : int = Field(nullable=True, default_factory=lambda: int(datetime.datetime.now(datetime.timezone.utc).timestamp()), sa_column_kwargs={"onupdate": int(datetime.datetime.now(datetime.timezone.utc).timestamp())})
-  
+  is_admin: bool = Field(default=False)
+
 class User(UserBase, table=True):
   """
   Database model for User with authentication fields.

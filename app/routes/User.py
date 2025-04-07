@@ -8,12 +8,13 @@ from typing import Annotated
 from app.db import get_session
 from app.models.User import User, UserCreate
 from app.controllers import UserController
-from app.utils.auth import get_current_user, verify_access_token
+from app.utils.auth import get_current_user, get_admin_user
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(
   prefix="/user",
   tags=["user"],
+  dependencies=[Depends(get_admin_user)],
   responses={
     status.HTTP_404_NOT_FOUND: {"description": "User not found"},
     status.HTTP_429_TOO_MANY_REQUESTS: {"description": "Rate limit exceeded"},
@@ -42,11 +43,11 @@ async def get_users(session = Depends(get_session)):
   users = UserController.get_all(session)
   return users
 
-@router.get("/me")
+@router.get("/me", dependencies=[])
 async def get_user_me(current_user : Annotated[User, Depends(get_current_user)]):
   return current_user
 
-@router.get("/{id}", dependencies=[Depends(verify_access_token)], 
+@router.get("/{id}", 
             response_model=User,
             summary="Get user by ID",
             description="""Retrieves details of a specific user.

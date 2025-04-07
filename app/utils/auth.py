@@ -138,6 +138,33 @@ async def get_current_user(
         raise credentials_exception
     return user
 
+async def get_admin_user(
+        token: Annotated[str, Depends(oauth2_scheme)],
+        session = Depends(get_session)
+):    
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials"
+    )
+    not_admin_exception = HTTPException(
+        status_code=401,
+        detail="User is not admin"
+    )
+
+    payload = await verify_access_token(token=token)
+    username = payload.get("sub")
+    if username is None:
+        raise credentials_exception
+    
+    token_data = TokenData(username=username)
+
+    user = UserController.get_by_username(token_data.username, session)
+    if user is None:
+        raise credentials_exception
+    if user.is_admin != True:
+        raise not_admin_exception
+    return user
+
 async def get_refresh_username(
         token: Annotated[str, Depends(oauth2_scheme)],
         session = Depends(get_session)

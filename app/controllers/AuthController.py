@@ -33,7 +33,6 @@ def create_token_response(db_user: User, session: Session):
    refresh_token, jti, expires_at = generate_refresh_token(token_payload)
 
    token_hash = get_hash(refresh_token)
-
    session.add(RefreshToken(
       id_token=jti,
       id_user=db_user.id_user,
