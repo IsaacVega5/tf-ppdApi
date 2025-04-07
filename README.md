@@ -1,4 +1,4 @@
-# ppdAPI - Primera Entrega 🚀
+# ppdAPI - Segunda Entrega 🚀
 
 API para gestión de usuarios, instituciones y roles, construida con **FastAPI** y **SQLModel**.  
 *(Parte del proyecto de Planificación y Desarrollo de Aplicaciones)*
