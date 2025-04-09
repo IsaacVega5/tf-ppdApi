@@ -27,14 +27,6 @@ refresh_token_expire_days = float(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS"))
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
-def verify_password(plain_password, hashed_password):
-    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-
-def get_hash(password: str):
-    pwd_bytes = password.encode('utf-8')
-    hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=bcrypt.gensalt())
-    return hashed_password
-
 def generate_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
