@@ -2,6 +2,7 @@ import datetime
 from typing import TYPE_CHECKING, Optional
 import uuid
 from sqlmodel import Relationship, SQLModel, Field
+from pydantic import EmailStr
 
 if TYPE_CHECKING:
   from app.models import UserInstitution, RefreshToken
@@ -49,7 +50,7 @@ class UserCreate(UserBase):
       password (str): Plain text password (will be hashed).
   """
   username: Optional[str]
-  email: str
+  email: EmailStr  # Validación automática de email
   password : str
 
 class UserLogin(UserBase):
