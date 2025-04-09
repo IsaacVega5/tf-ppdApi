@@ -1,7 +1,8 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session
 
-from app.utils.auth import verify_password, generate_access_token, generate_refresh_token, get_hash
+from app.utils.hashing import get_hash, verify_password
+from app.utils.auth import generate_access_token, generate_refresh_token
 from app.models.User import User, UserLogin
 from app.models.Auth import Token
 from app.models.RefreshToken import RefreshToken

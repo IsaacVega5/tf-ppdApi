@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session
-from app.utils.auth import get_hash
+from app.utils.hashing import get_hash
 
 import sqlmodel as sql
 
