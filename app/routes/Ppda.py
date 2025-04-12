@@ -1,18 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Annotated
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from typing import List
 
 from app.db import get_session
-from app.models import Ppda, PpdaCreate, PpdaUpdate
+from app.models import Ppda, PpdaCreate, PpdaUpdate, User
 from app.controllers import InstitutionController, PpdaController
-from app.utils.auth import verify_access_token
+from app.utils.auth import get_admin_user, get_current_user
+from app.utils.rbac import verify_institution_role
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(
   prefix="/ppda",
   tags=["ppda"],
-  dependencies=[Depends(verify_access_token)],
   responses={
     status.HTTP_404_NOT_FOUND: {"description": "Ppda not found"},
     status.HTTP_429_TOO_MANY_REQUESTS: {"description": "Rate limit exceeded"},
@@ -23,6 +24,7 @@ router = APIRouter(
 
 @router.get("/",
             response_model=List[Ppda],
+            dependencies=[Depends(get_admin_user)],
             summary="List all ppda",
             description="""Retrieves a list of all registered ppda in the system.
             
@@ -54,7 +56,11 @@ async def get_ppda(session = Depends(get_session)):
             """,
             response_description="The requested ppda object"
             )
-async def get_ppda_by_id(id:str, session = Depends(get_session)):
+async def get_ppda_by_id(
+  id: str,
+  user : Annotated[User, Depends(get_current_user)],
+  session = Depends(get_session)
+):
   """Retrieves a single ppda by its ID.
     Args:
         id (str): The UUID of the ppda to retrieve.
@@ -63,24 +69,39 @@ async def get_ppda_by_id(id:str, session = Depends(get_session)):
         Ppda: The requested ppda object.
   """
   ppda = await PpdaController.get_by_id(id, session)
+  
   if not ppda:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ppda not found")
+
+  verify_institution_role(
+    institution_id=ppda.id_institution,
+    required_roles=["viewer"],
+    current_user=user,
+    session=session
+  )
+
   return ppda
+
+# TODO: Get all MY ppda's
+# TODO: Get all ppda's by institution
 
 @router.post("/",
              response_model=Ppda,
              summary="Create a new ppda",
              description="""Creates a new ppda in the system.
-            
-            Args:
-                ppda (Ppda): The ppda object to create.
-            
-            Returns:
-                Ppda: The newly created ppda object.
-            """,
-            response_description="The newly created ppda object"
+             
+             Args:
+                 ppda (Ppda): The ppda object to create.
+             
+             Returns:
+                 Ppda: The newly created ppda object.
+             """,
+             response_description="The newly created ppda object"
             )
-async def create_ppda(ppda: PpdaCreate, session = Depends(get_session)):
+async def create_ppda(
+  ppda: PpdaCreate,
+  user : Annotated[User, Depends(get_current_user)],
+  session = Depends(get_session)):
   """
   Create a new ppda.
   
@@ -93,9 +114,17 @@ async def create_ppda(ppda: PpdaCreate, session = Depends(get_session)):
   Raises:
       HTTPException: 404 if institution doesn't exist.
   """
-  Institution = await InstitutionController.get_by_id(ppda.id_institution, session)
-  if not Institution:
+  institution = await InstitutionController.get_by_id(ppda.id_institution, session)
+  if not institution:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Institution not found")
+  
+  verify_institution_role(
+    institution_id=institution.id_institution,
+    required_roles=["editor"],
+    current_user=user,
+    session=session
+  )
+
   ppda = await PpdaController.create_ppda(ppda, session)
   return ppda
 
@@ -113,7 +142,12 @@ async def create_ppda(ppda: PpdaCreate, session = Depends(get_session)):
             """,
             response_description="The updated ppda object"
             )
-async def update_ppda(id: str, ppda: PpdaUpdate, session = Depends(get_session)):
+async def update_ppda(
+  id: str,
+  ppda: PpdaUpdate,
+  user: Annotated[User, Depends(get_current_user)],
+  session = Depends(get_session)
+):
   """Updates an existing ppda by its ID.
     Args:
         id (str): The UUID of the ppda to update.
@@ -135,10 +169,19 @@ async def update_ppda(id: str, ppda: PpdaUpdate, session = Depends(get_session))
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Institution not found")
   
   ppda_db.id_institution = ppda.id_institution
+
+  verify_institution_role(
+    institution_id=ppda.id_institution,
+    current_user=user,
+    required_roles=["editor"],
+    session=session
+  )
+
   ppda = await PpdaController.update_ppda(ppda_db, session)
   return ppda
 
 @router.delete("/{id}",
+               dependencies=[Depends(get_admin_user)],
                summary="Delete ppda by ID",
                description="""Deletes an existing ppda by its ID.
             

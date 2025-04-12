@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from typing import List
@@ -14,7 +14,6 @@ limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(
   prefix="/user",
   tags=["user"],
-  dependencies=[Depends(get_admin_user)],
   responses={
     status.HTTP_404_NOT_FOUND: {"description": "User not found"},
     status.HTTP_429_TOO_MANY_REQUESTS: {"description": "Rate limit exceeded"},
@@ -25,6 +24,7 @@ router = APIRouter(
 
 @router.get("/",
             response_model=List[User],
+            dependencies=[Depends(get_admin_user)],
             summary="List all users",
             description="""Retrieves a list of all registered users in the system.
             
@@ -43,12 +43,13 @@ async def get_users(session = Depends(get_session)):
   users = UserController.get_all(session)
   return users
 
-@router.get("/me", dependencies=[])
+@router.get("/me")
 async def get_user_me(current_user : Annotated[User, Depends(get_current_user)]):
   return current_user
 
 @router.get("/{id}", 
             response_model=User,
+            dependencies=[Depends(get_admin_user)],
             summary="Get user by ID",
             description="""Retrieves details of a specific user.
             
@@ -79,6 +80,7 @@ async def get_user(id, session = Depends(get_session)):
   return user
 
 @router.delete("/{id}",
+                dependencies=[Depends(get_admin_user)],
                 summary="Delete user account",
                 description="""Permanently deletes a user account.
                 
@@ -101,6 +103,7 @@ async def delete_user(id, session = Depends(get_session)):
 
 @router.post("/",
               response_model=User,
+              dependencies=[Depends(get_admin_user)],
               status_code=status.HTTP_201_CREATED,
               summary="Register new user",
               description="""Creates a new user account after validation.
