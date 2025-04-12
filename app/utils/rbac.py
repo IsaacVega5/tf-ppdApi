@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, status
 from app.utils.auth import get_current_user
 from app.models.User import User
 from app.models import UserInstitution
+from app.controllers import UserRolController
 
 from sqlmodel import Session, select
 from app.db import get_session
@@ -11,37 +12,35 @@ from app.db import get_session
 
 def verify_institution_role(
     institution_id: str,
-    required_roles: list[str],
+    required_role: str,
     current_user: Annotated[User, Depends(get_current_user)],
     session: Session = Depends(get_session)
 ):
     if current_user.is_admin:
         return True
 
-    institution_memberships = session.exec(
+    institution_membership = session.exec(
         select(UserInstitution)
         .where(UserInstitution.id_user == current_user.id_user)
         .where(UserInstitution.id_institution == institution_id)
-    ).all()
+    ).first()
 
-    if not institution_memberships:
+    if not institution_membership:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="User doesn't have access to resources of this institution."
+            detail="User can't access to resources of this institution."
         )
     
-    if len(institution_memberships) > 1:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Multiple memberships found for user in institution"
-        )
+    required_level_access = UserRolController.get_id_by_name(required_role, session)
+    membership_level_access = UserRolController.get_id_by_name(
+        name=institution_membership.user_rol.user_rol_name,
+        session=session
+    )
     
-    institution_membership = institution_memberships[0]
-    
-    if institution_membership.user_rol.user_rol_name not in required_roles:
+    if membership_level_access < required_level_access:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient role for this action in this institution."
+            detail="User can't execute this action for this institution."
         )
     
     return True

@@ -75,7 +75,7 @@ async def get_ppda_by_id(
 
   verify_institution_role(
     institution_id=ppda.id_institution,
-    required_roles=["viewer"],
+    required_role="viewer",
     current_user=user,
     session=session
   )
@@ -120,7 +120,7 @@ async def create_ppda(
   
   verify_institution_role(
     institution_id=institution.id_institution,
-    required_roles=["editor"],
+    required_role="editor",
     current_user=user,
     session=session
   )
@@ -173,7 +173,7 @@ async def update_ppda(
   verify_institution_role(
     institution_id=ppda.id_institution,
     current_user=user,
-    required_roles=["editor"],
+    required_role="editor",
     session=session
   )
 
