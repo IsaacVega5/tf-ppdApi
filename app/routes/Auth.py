@@ -1,5 +1,6 @@
 
 from fastapi import APIRouter, Depends, status
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.db import get_session
 
@@ -9,7 +10,6 @@ from typing import Annotated
 from app.utils.auth import get_refresh_username
 
 
-
 router = APIRouter(
     prefix="/auth",
     tags=["auth"],
@@ -17,8 +17,15 @@ router = APIRouter(
 )
 
 @router.post("/token")
-async def login_for_token(user: UserLogin, session = Depends(get_session)):
-    return AuthController.login(user, session)
+async def login_for_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session = Depends(get_session)
+):
+    return AuthController.login(
+        UserLogin(
+            username=form_data.username,
+            password=str(form_data.password)),
+        session)
 
 @router.post("/refresh-token")
 async def refresh_token(
