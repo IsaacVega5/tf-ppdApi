@@ -18,6 +18,7 @@ class UserInstitutionBase(SQLModel):
   id_user : Optional[str] = Field(default=None, foreign_key="user.id_user", primary_key=True)
   id_institution : Optional[str] = Field(default=None, foreign_key="institution.id_institution", primary_key=True)
   id_user_rol : Optional[int] = Field(default=None, foreign_key="user_rol.id_user_rol")
+  is_active : bool = Field(default=True, nullable=False)
   
 class UserInstitution(UserInstitutionBase, table=True):
   """
