@@ -3,18 +3,18 @@ import uuid
 from sqlmodel import Relationship, SQLModel, Field
 
 if TYPE_CHECKING: 
-  from app.models import ActionType, Ppda, DeadLine, Kpi, Report
+  from app.models import ActionType, Ppda, DeadLine, Kpi, Report, User
   
 class ActionBase(SQLModel):
     """Base model class for Action containing common attributes.
     
     Attributes:
         id_ppda (Optional[str]): Foreign key referencing the PPDA this action belongs to
-        rut_creator (Optional[str]): RUT (Chilean ID) of the person who created the action
+        id_user (Optional[str]): Foreign key referencing the user who created this action
         id_action_type (Optional[int]): Foreign key referencing the type of action
     """
     id_ppda : Optional[str] = Field(default=None, foreign_key="ppda.id_ppda")
-    rut_creator: Optional[str] = Field(default=None)
+    id_user : Optional[str] = Field(default=None, foreign_key="user.id_user")
     id_action_type: Optional[int] = Field(default=None, foreign_key="action_type.id_action_type")
   
 class Action(ActionBase, table=True):
@@ -29,6 +29,7 @@ class Action(ActionBase, table=True):
         deadlines (list[DeadLine]): List of deadlines associated with this action
         kpi_list (list[Kpi]): List of KPIs associated with this action
         report (Optional[Report]): Associated report for this action
+        user (Optional[User]): Relationship to the user who created this action
     """
     __tablename__ = "action"
     id_action: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, unique=True)
@@ -38,3 +39,4 @@ class Action(ActionBase, table=True):
     deadlines : list["DeadLine"] = Relationship(back_populates="action")
     kpi_list : list["Kpi"] = Relationship(back_populates="action")
     report : Optional["Report"] = Relationship(back_populates="report_action")
+    user: Optional["User"] = Relationship(back_populates="actions")
