@@ -14,10 +14,12 @@ class UserInstitutionBase(SQLModel):
       id_user (str): Composite primary key - references User.id_user
       id_institution (str): Composite primary key - references Institution.id_institution
       id_user_rol (Optional[int]): Foreign key to UserRol, defines user's role in institution
+      is_active (bool): Flag indicating if the association is active
   """
   id_user : Optional[str] = Field(default=None, foreign_key="user.id_user", primary_key=True)
   id_institution : Optional[str] = Field(default=None, foreign_key="institution.id_institution", primary_key=True)
   id_user_rol : Optional[int] = Field(default=None, foreign_key="user_rol.id_user_rol")
+  is_active : bool = Field(default=True, nullable=False)
   
 class UserInstitution(UserInstitutionBase, table=True):
   """
@@ -41,3 +43,44 @@ class UserInstitution(UserInstitutionBase, table=True):
   user : "User" = Relationship(back_populates="user_institution_user")
   institution_user_institution : "Institution" = Relationship(back_populates="user_institution_institution")
   user_rol : Optional["UserRol"] = Relationship(back_populates="user_institution_user_rol")
+
+class UserInstitutionPublic(UserInstitutionBase):
+  """
+  Public representation of UserInstitution for serialization purposes.
+  
+  Attributes:
+      id_user (str): Composite primary key - references User.id_user
+      id_institution (str): Composite primary key - references Institution.id_institution
+  """
+  id_user : Optional[str]
+  id_institution : Optional[str]
+  is_active : Optional[bool]
+  user_rol : Optional[str]
+
+class UserInstitutionCreate(UserInstitutionBase):
+  """
+  Model for creating a new UserInstitution association in the database.
+  
+  Attributes:
+      id_user (str): Composite primary key - references User.id_user
+      id_institution (str): Composite primary key - references Institution.id_institution
+      id_user_rol (Optional[int]): Foreign key to UserRol, defines user's role in institution
+  """
+  id_user : Optional[str]
+  id_institution : Optional[str]
+  id_user_rol : Optional[int]
+
+class UserInstitutionUpdate(UserInstitutionBase):
+  """
+  Model for updating an existing UserInstitution association in the database.
+  
+  Attributes:
+      id_user (str): Composite primary key - references User.id_user
+      id_institution (str): Composite primary key - references Institution.id_institution
+      id_user_rol (Optional[int]): Foreign key to UserRol, defines user's role in institution
+      is_active (bool): Flag indicating if the association is active
+  """
+  id_user : Optional[str]
+  id_institution : Optional[str]
+  id_user_rol : Optional[int] = None
+  is_active : Optional[bool] = None
