@@ -161,7 +161,7 @@ async def create(user_institution: UserInstitutionCreate, session : sql.Session)
   
   Raises:
       HTTPException: 404 if the user or institution is not found
-      HTTPException: 404 if the user-institution relationship already exists
+      HTTPException: 409 if the user-institution relationship already exists
   """
   user = UserController.get_by_id(user_institution.id_user, session)
   institution = await InstitutionController.get_by_id(user_institution.id_institution, session)
@@ -170,7 +170,7 @@ async def create(user_institution: UserInstitutionCreate, session : sql.Session)
   
   user_institution_db = await get_by_ids(user_institution.id_user, user_institution.id_institution, session)
   if user_institution_db:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User-institution relationship already exists")
+    raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User-institution relationship already exists")
   
   new_user_institution = UserInstitution()
   new_user_institution.id_user = user_institution.id_user

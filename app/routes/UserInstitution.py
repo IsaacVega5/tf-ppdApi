@@ -156,7 +156,7 @@ async def create_user_institution(user_institution: UserInstitutionCreate, curre
   Raises:
       HTTPException: 403 if the current user is not an admin
       HTTPException: 404 if the user or institution is not found
-      HTTPException: 404 if the user-institution relationship already exists
+      HTTPException: 409 if the user-institution relationship already exists
   """
   if not current_user.is_admin:
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
