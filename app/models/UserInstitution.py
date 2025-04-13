@@ -65,7 +65,6 @@ class UserInstitutionCreate(UserInstitutionBase):
       id_user (str): Composite primary key - references User.id_user
       id_institution (str): Composite primary key - references Institution.id_institution
       id_user_rol (Optional[int]): Foreign key to UserRol, defines user's role in institution
-      is_active (bool): Flag indicating if the association is active
   """
   id_user : Optional[str]
   id_institution : Optional[str]
