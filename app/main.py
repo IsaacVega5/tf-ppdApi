@@ -9,7 +9,7 @@ from starlette.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 
-from app.routes import InstitutionType, User, Institution, Ppda, Auth
+from app.routes import InstitutionType, User, Institution, Ppda, Auth, UserInstitution
 
 load_dotenv()
 
@@ -34,7 +34,7 @@ app.include_router(InstitutionType.router)
 app.include_router(Institution.router)
 app.include_router(Ppda.router)
 app.include_router(Auth.router)
-
+app.include_router(UserInstitution.router)
 
 # this defines a max; if a router sets a limit less than this one, then
 # the router limit prevails. if a router sets a limit higher than this one,
