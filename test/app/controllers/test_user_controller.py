@@ -95,7 +95,7 @@ def test_create_user_duplicate_email(session: Session):
     with pytest.raises(HTTPException) as exc_info:
         create_user(user2, session)
     assert exc_info.value.status_code == status.HTTP_409_CONFLICT
-    assert "Email already registered" in exc_info.value.detail
+    assert "Email or username is already in use" in exc_info.value.detail
 
 # 4. Tests de Operaciones CRUD
 # ----------------------------
