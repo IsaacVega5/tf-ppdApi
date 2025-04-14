@@ -1,8 +1,19 @@
 import pytest
 from fastapi.testclient import TestClient
+from fastapi import status
 from app.main import app
 from app.controllers import InstitutionTypeController
 from app.models.InstitutionType import InstitutionTypeCreate, InstitutionTypeUpdate
+from app.utils.auth import get_admin_user
+
+@pytest.fixture(autouse=True)
+def override_admin_user():
+    app.dependency_overrides[get_admin_user] = lambda: {
+        "username": "test_admin",
+        "is_admin": True
+    }
+    yield
+    app.dependency_overrides = {}
 
 @pytest.fixture
 def client():
@@ -17,7 +28,7 @@ def test_get_all_institution_types(mocker, client):
 
     response = client.get("/institution-type/")
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == mock_data
 
 def test_get_institution_type_by_id(mocker, client):
@@ -26,7 +37,7 @@ def test_get_institution_type_by_id(mocker, client):
 
     response = client.get("/institution-type/1")
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == mock_data
 
 def test_get_institution_type_not_found(mocker, client):
@@ -34,7 +45,7 @@ def test_get_institution_type_not_found(mocker, client):
 
     response = client.get("/institution-type/999")
 
-    assert response.status_code == 404
+    assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == {"detail": "Institution type not found"}
 
 def test_create_institution_type(mocker, client):
@@ -45,7 +56,7 @@ def test_create_institution_type(mocker, client):
 
     response = client.post("/institution-type/", json=new_data.model_dump())
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == created_data
 
 def test_delete_institution_type(mocker, client):
@@ -53,7 +64,7 @@ def test_delete_institution_type(mocker, client):
 
     response = client.delete("/institution-type/1")
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {"message": "Institution type deleted"}
 
 def test_update_institution_type(mocker, client):
@@ -64,5 +75,13 @@ def test_update_institution_type(mocker, client):
 
     response = client.put("/institution-type/1", json=updated_data.model_dump())
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == response_data
+
+def test_reject_unauthenticated_user(client):
+    app.dependency_overrides = {}
+
+    response = client.get("/institution-type/")
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json() == {"detail": "Not authenticated"}

@@ -1,8 +1,20 @@
 import pytest
 from fastapi.testclient import TestClient
+from fastapi import status
 from app.main import app
 from app.controllers import InstitutionController
 from app.models.Institution import InstitutionCreate, InstitutionUpdate
+from app.controllers import InstitutionTypeController
+from app.utils.auth import get_admin_user
+
+@pytest.fixture(autouse=True)
+def override_admin_user():
+    app.dependency_overrides[get_admin_user] = lambda: {
+        "username": "test_admin",
+        "is_admin": True
+    }
+    yield
+    app.dependency_overrides = {}
 
 @pytest.fixture
 def client():
@@ -17,7 +29,7 @@ def test_get_all_institutions(mocker, client):
 
   response = client.get("/institution/")
 
-  assert response.status_code == 200
+  assert response.status_code == status.HTTP_200_OK
   assert response.json() == mock_data
   
 def test_get_institution_by_id(mocker, client):
@@ -26,7 +38,7 @@ def test_get_institution_by_id(mocker, client):
 
   response = client.get("/institution/68d5412b-29d7-40ef-b234-64a5f55b5497")
 
-  assert response.status_code == 200
+  assert response.status_code == status.HTTP_200_OK
   assert response.json() == mock_data
 
 def test_get_institution_not_found(mocker, client):
@@ -34,18 +46,36 @@ def test_get_institution_not_found(mocker, client):
 
   response = client.get("/institution/aaa-bbb-ccc-ddd-eee-fff")
 
-  assert response.status_code == 404
+  assert response.status_code == status.HTTP_404_NOT_FOUND
   assert response.json() == {"detail": "Institution not found"}
 
 def test_create_institution(mocker, client):
-  new_data = InstitutionCreate(institution_name="New Institution", id_institution_type=2)
-  created_data = {"id_institution": "68d5412b-29d7-40ef-b234-64a5f55b5497", "institution_name": "New Institution", "id_institution_type": 2}
-  mocker.patch.object(InstitutionController, "create_institution", return_value=created_data)
+    new_data = InstitutionCreate(institution_name="New Institution", id_institution_type=2)
+    created_data = {
+        "id_institution": "68d5412b-29d7-40ef-b234-64a5f55b5497",
+        "institution_name": "New Institution",
+        "id_institution_type": 2
+    }
 
-  response = client.post("/institution/", json=new_data.model_dump())
+    # Mockea el tipo de institución como si existiera
+    mocker.patch.object(
+        InstitutionTypeController, 
+        "get_by_id", 
+        return_value={"id_institution_type": 2, "type_name": "University"}
+    )
 
-  assert response.status_code == 200
-  assert response.json() == created_data
+    # Mockea la creación
+    mocker.patch.object(
+        InstitutionController, 
+        "create_institution", 
+        return_value=created_data
+    )
+
+    response = client.post("/institution/", json=new_data.model_dump())
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.json() == created_data
+
 
 def test_update_institution(mocker, client):
   updated_data = InstitutionUpdate(institution_name="Updated Institution")
@@ -56,5 +86,5 @@ def test_update_institution(mocker, client):
 
   response = client.put("/institution/68d5412b-29d7-40ef-b234-64a5f55b5497", json=updated_data.model_dump(exclude_unset=True))
 
-  assert response.status_code == 200
+  assert response.status_code == status.HTTP_200_OK
   assert response.json() == response_data

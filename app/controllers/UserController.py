@@ -21,13 +21,15 @@ def create_user(user: UserCreate, session: Session):
         HTTPException: 409 Conflict if email is already registered.
     """
     existing_user = session.exec(
-        sql.select(User).where(User.email == user.email)
+        sql.select(User).where(
+            (User.email == user.email) | (User.username == user.username)
+        )
     ).first()
     
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered"
+            detail="Email or username is already in use"
         )
     
     # Hash de la contraseña
