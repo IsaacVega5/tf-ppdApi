@@ -1,5 +1,4 @@
 import pytest
-# from typing import Optional
 from sqlmodel import Session, SQLModel, create_engine
 from app.models.ActionType import ActionType, ActionTypeBase
 

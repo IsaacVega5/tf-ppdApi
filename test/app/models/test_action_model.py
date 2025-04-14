@@ -1,7 +1,5 @@
 import pytest
 from uuid import UUID
-# from typing import Optional
-# from pydantic import ValidationError
 from sqlmodel import Session, SQLModel, create_engine
 from app.models.Action import Action, ActionBase
 from app.models import ActionType, Ppda
@@ -162,7 +160,7 @@ class TestActionDB:
 
     def test_relationship_operations(self):
         """Test operaciones con relaciones (ejemplo con ActionType)"""
-                
+
         # Crear ActionType primero
         action_type = ActionType(id_action_type=1, action_type="Test Action")
         self.session.add(action_type)
