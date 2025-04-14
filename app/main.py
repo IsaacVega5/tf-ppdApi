@@ -10,6 +10,7 @@ import os
 from dotenv import load_dotenv
 
 from app.routes import InstitutionType, User, Institution, Ppda, Auth, UserInstitution
+from app.utils.docs import tags_metadata
 
 load_dotenv()
 
@@ -27,7 +28,10 @@ middleware = [
   )
 ]
 
-app = FastAPI(middleware=middleware)
+app = FastAPI(
+  middleware=middleware,
+  openapi_tags=tags_metadata
+)
 
 app.include_router(User.router)
 app.include_router(InstitutionType.router)
