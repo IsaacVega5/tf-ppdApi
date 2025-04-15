@@ -168,14 +168,14 @@ async def update_ppda(
   if not institution:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Institution not found")
   
-  ppda_db.id_institution = ppda.id_institution
-
   verify_institution_role(
-    institution_id=ppda.id_institution,
+    institution_id=[ppda.id_institution, ppda_db.id_institution],
     current_user=user,
     required_role="editor",
     session=session
   )
+  
+  ppda_db.id_institution = ppda.id_institution
 
   ppda = await PpdaController.update_ppda(ppda_db, session)
   return ppda

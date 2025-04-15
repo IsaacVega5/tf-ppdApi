@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import List, Annotated
 from fastapi import Depends, HTTPException, status
 
 from app.utils.auth import get_current_user
@@ -10,37 +10,51 @@ from sqlmodel import Session, select
 from app.db import get_session
 
 
+def get_id_by_name(name: str, session: Session):
+    user_rol = UserRolController.get_by_name(name=name, session=session)
+    if user_rol is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User role '{name}' not found")
+    return user_rol.id_user_rol
+
 def verify_institution_role(
-    institution_id: str,
+    institution_ids: List[str],
     required_role: str,
     current_user: Annotated[User, Depends(get_current_user)],
     session: Session = Depends(get_session)
 ):
+    if not institution_ids:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="institution_ids cannot be empty"
+        )
+
     if current_user.is_admin:
         return True
 
-    institution_membership = session.exec(
+    memberships = session.exec(
         select(UserInstitution)
         .where(UserInstitution.id_user == current_user.id_user)
-        .where(UserInstitution.id_institution == institution_id)
-    ).first()
+        .where(UserInstitution.id_institution.in_(institution_ids))
+    ).all()
 
-    if not institution_membership:
+    if len(memberships) < len(institution_ids):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="User can't access to resources of this institution."
+            detail="User in not member of all required institutions"
         )
     
-    required_level_access = UserRolController.get_id_by_name(required_role, session)
-    membership_level_access = UserRolController.get_id_by_name(
-        name=institution_membership.user_rol.user_rol_name,
-        session=session
-    )
+    required_access_level = get_id_by_name(required_role, session)
     
-    if membership_level_access < required_level_access:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User can't execute this action for this institution."
+    for membership in memberships:
+        membership_access_level = get_id_by_name(
+            name=membership.user_rol.user_rol_name,
+            session=session
         )
+        
+        if membership_access_level < required_access_level:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"User can't execute this action for institution: {membership.id_institution}"
+            )
     
     return True
