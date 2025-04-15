@@ -2,9 +2,10 @@ import datetime
 from typing import TYPE_CHECKING, Optional
 import uuid
 from sqlmodel import Relationship, SQLModel, Field
+from pydantic import EmailStr
 
 if TYPE_CHECKING:
-  from app.models import UserInstitution, RefreshToken
+  from app.models import UserInstitution, RefreshToken, Action
 
 class UserBase(SQLModel):
   """
@@ -30,6 +31,7 @@ class User(UserBase, table=True):
       id_user (str): Unique UUID identifier (primary key).
       password (str): Hashed password (required).
       user_institution_user (List[UserInstitution]): Relationship to institutions.
+      actions (List[Action]): Relationship to actions.
   """
   __tablename__ = "user"
   
@@ -38,6 +40,7 @@ class User(UserBase, table=True):
   
   user_institution_user : list["UserInstitution"] = Relationship(back_populates="user")
   refresh_token: list["RefreshToken"] = Relationship(back_populates="user")
+  actions : list["Action"] = Relationship(back_populates="user")
   
 class UserCreate(UserBase):
   """
@@ -49,7 +52,7 @@ class UserCreate(UserBase):
       password (str): Plain text password (will be hashed).
   """
   username: Optional[str]
-  email: str
+  email: EmailStr  # Validación automática de email
   password : str
 
 class UserLogin(UserBase):

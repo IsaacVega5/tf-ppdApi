@@ -4,7 +4,7 @@ from sqlmodel import Session
 from app.utils.hashing import get_hash, verify_password
 from app.utils.auth import generate_access_token, generate_refresh_token
 from app.models.User import User, UserLogin
-from app.models.Auth import Token
+from app.models.Auth import AuthTokenResponse
 from app.models.RefreshToken import RefreshToken
 
 import sqlmodel as sql
@@ -42,7 +42,7 @@ def create_token_response(db_user: User, session: Session):
    ))
    session.commit()
 
-   token_response = Token(
+   token_response = AuthTokenResponse(
       access_token=access_token,
       refresh_token=refresh_token,
       token_type="bearer"
