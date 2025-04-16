@@ -13,8 +13,8 @@ from app.routes import InstitutionType, User, Institution, Ppda, Auth, UserInsti
 from app.utils.docs import tags_metadata
 from app.db import init_db
 
-init_db()
 load_dotenv()
+init_db()
 
 origins = [
     "*",

@@ -39,8 +39,7 @@ def sample_user(session):
 async def test_login_success(test_client, sample_user):
     login_data = {
         "username": sample_user.username,
-        "password": "valid_password",
-        "grant_type": "password"
+        "password": "valid_password"
     }
     
     with patch("app.controllers.AuthController.login") as mock_login:
