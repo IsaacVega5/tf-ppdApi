@@ -11,7 +11,7 @@ from sqlmodel import Session
 # Importar componentes a testear
 from app.controllers.AuthController import login, refresh_token, create_token_response
 from app.models.User import User, UserLogin
-from app.models.Auth import Token
+from app.models.Auth import AuthTokenResponse
 from app.models.RefreshToken import RefreshToken
 from app.utils.auth import (
     generate_access_token,
@@ -81,7 +81,7 @@ def test_login_success(mock_session, mock_user, mock_user_login):
         result = login(mock_user_login, mock_session)
     
     # Verificaciones
-    assert isinstance(result, Token)
+    assert isinstance(result, AuthTokenResponse)
     assert result.access_token == "mock_access_token"
     assert result.refresh_token == "mock_refresh_token"
     assert result.token_type == "bearer"
@@ -118,7 +118,7 @@ def test_refresh_token_success(mock_session, mock_user):
         
         result = refresh_token("testuser", mock_session)
     
-    assert isinstance(result, Token)
+    assert isinstance(result, AuthTokenResponse)
     assert result.access_token == "mock_access_token"
     assert result.refresh_token == "mock_refresh_token"
     mock_session.add.assert_called_once()
@@ -144,7 +144,7 @@ def test_create_token_response(mock_session, mock_user):
         
         result = create_token_response(mock_user, mock_session)
     
-    assert isinstance(result, Token)
+    assert isinstance(result, AuthTokenResponse)
     assert result.access_token == "test_access_token"
     assert result.refresh_token == "test_refresh_token"
     
