@@ -1,0 +1,35 @@
+name: FastAPI CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE: sqlite
+      DATABASE_NAME: ""
+      DATABASE_HOST: ""
+      DATABASE_USER: ""
+      DATABASE_PASSWORD: ""
+      DATABASE_SSLMODE: ""
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      REFRESH_TOKEN_EXPIRE_DAYS: 7
+      SECRET_KEY: "your-secret"
+      ALGORITHM: "HS256"
+      RATE_LIMIT: "5000/minute"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run tests
+        run: |
+          PYTHONPATH=$PYTHONPATH:$(pwd) pytest
