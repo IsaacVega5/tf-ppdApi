@@ -9,7 +9,7 @@ from app.models import ActionType, Ppda
 def valid_action_data():
     return {
         "id_ppda": "PPDA-123",
-        "rut_creator": "12.345.678-9",
+        "id_user": "12.345.678-9",
         "id_action_type": 1
     }
 
@@ -48,14 +48,14 @@ class TestActionBase:
         action = ActionBase(**valid_action_data)
         
         assert action.id_ppda == "PPDA-123"
-        assert action.rut_creator == "12.345.678-9"
+        assert action.id_user == "12.345.678-9"
         assert action.id_action_type == 1
 
     def test_all_fields_optional(self):
         """Test que todos los campos de ActionBase son opcionales"""
         action = ActionBase()
         assert action.id_ppda is None
-        assert action.rut_creator is None
+        assert action.id_user is None
         assert action.id_action_type is None
 
     @pytest.mark.parametrize("rut", [
@@ -65,9 +65,9 @@ class TestActionBase:
     ])
     def test_valid_rut_formats(self, valid_action_data, rut):
         """Test que acepta varios formatos válidos de RUT"""
-        valid_action_data["rut_creator"] = rut
+        valid_action_data["id_user"] = rut
         action = ActionBase(**valid_action_data)
-        assert action.rut_creator == rut
+        assert action.id_user == rut
 
 # Tests para Action
 class TestAction:
@@ -169,7 +169,7 @@ class TestActionDB:
         # Crear Action relacionado
         action = Action(
             id_ppda="PPDA-2023-001",
-            rut_creator="12.345.678-9",
+            id_user="12.345.678-9",
             id_action_type=1
         )
         self.session.add(action)
