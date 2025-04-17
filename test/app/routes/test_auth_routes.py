@@ -5,7 +5,7 @@ from unittest.mock import patch
 from sqlmodel import SQLModel, Session, create_engine
 from app.main import app
 from app.models import User
-from app.models.Auth import Token
+from app.models.Auth import AuthTokenResponse
 from app.controllers import AuthController
 import uuid
 from datetime import datetime
@@ -48,7 +48,7 @@ async def test_login_success(test_client, sample_user):
             "refresh_token": "mock_refresh",
             "token_type": "bearer"
         }
-        response = test_client.post("/auth/token", json=login_data)
+        response = test_client.post("/auth/token", data=login_data)
     
     assert response.status_code == status.HTTP_200_OK
     assert "access_token" in response.json()
@@ -77,7 +77,7 @@ def test_create_token_response(session, sample_user):
             
             result = AuthController.create_token_response(sample_user, session)
             
-            assert isinstance(result, Token)
+            assert isinstance(result, AuthTokenResponse)
             assert result.access_token == "access_mock"
             assert result.refresh_token == "refresh_mock"
             assert result.token_type == "bearer"
