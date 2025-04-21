@@ -20,25 +20,35 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Insert default user roles
+    # Insert default user roles if they don't exist
         
     meta = sa.MetaData()
     user_rol = sa.Table('user_rol', meta, autoload_with=op.get_bind())
-    op.bulk_insert(
-        user_rol,
-        [
-            {
-                "id_user_rol": 1,
-                "user_rol_name": "viewer"
-            },
-            {
-                "id_user_rol": 2,
-                "user_rol_name": "editor"
-            }
-        ]
-    )
+    
+    conn = op.get_bind()
+    existing_roles = conn.execute(
+        sa.select(user_rol.c.user_rol_name)
+    ).fetchall()
+    
+    existing_roles_names = [role[0] for role in existing_roles]
+    
+    default_roles = [
+        {"user_rol_name": "viewer"},    
+        {"user_rol_name": "editor"}    
+    ]
+
+    roles_to_insert = [
+        role for role in default_roles 
+        if role["user_rol_name"] not in existing_roles_names
+    ]
+    
+    if roles_to_insert:
+        op.bulk_insert(
+            user_rol,
+            roles_to_insert
+        )
 
 
 def downgrade() -> None:
     # Remove default user roles
-    op.execute("DELETE FROM user_rol WHERE id_user_rol IN (1, 2)")
+    op.execute("DELETE FROM user_rol WHERE user_rol_name IN ('viewer', 'editor')")
