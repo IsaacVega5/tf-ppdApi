@@ -24,3 +24,23 @@ class ActionType(ActionTypeBase, table=True):
     id_action_type: Optional[int] = Field(default=None, primary_key=True)
     
     action: list["Action"] = Relationship(back_populates="action_type")
+
+class ActionTypeCreate(ActionTypeBase):
+    """Model for creating a new action type.
+    
+    Inherits from ActionTypeBase and is used for creating new action types.
+    
+    Attributes:
+        action_type (Optional[str]): Description of the action type
+    """
+    action_type: Optional[str]
+
+class ActionTypeUpdate(ActionTypeBase):
+    """Model for updating an existing action type.
+    
+    Inherits from ActionTypeBase and is used for updating existing action types.
+    
+    Attributes:
+        action_type (Optional[str]): Description of the action type
+    """
+    action_type: Optional[str]
