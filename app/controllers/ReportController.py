@@ -87,3 +87,15 @@ async def delete_report(id: str, session: sql.Session):
     session.delete(report)
     session.commit()
     return {"detail": "Report deleted", "id": id}
+
+async def get_by_action(id_action: str, session: sql.Session):
+    """
+    Get all reports for a given action.
+    Args:
+        id_action (str): The action ID to filter reports.
+        session (sql.Session): Database session for operations.
+    Returns:
+        List[Report]: List of reports associated with the given action ID.
+    """
+    statement = sql.select(Report).where(Report.id_action == id_action)
+    return session.exec(statement).all()

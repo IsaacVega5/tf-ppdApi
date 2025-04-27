@@ -4,7 +4,7 @@ from fastapi import status, HTTPException
 from uuid import uuid4
 from app.main import app
 from app.models.DeadLine import DeadLine
-from app.controllers.DeadLineController import DeadLineController
+from app.controllers import DeadLineController
 from app.utils.auth import verify_access_token
 
 @pytest.fixture(autouse=True)

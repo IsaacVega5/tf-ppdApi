@@ -67,6 +67,21 @@ async def test_delete_report_not_found(session):
     assert "not found" in str(excinfo.value).lower()
 
 @pytest.mark.asyncio
+async def test_get_reports_by_action(session):
+    # Crea dos reportes con la misma acción y uno con otra
+    data1 = get_report_data("action-1")
+    data2 = get_report_data("action-1")
+    data3 = get_report_data("action-2")
+    await ReportController.create_report(data1, session)
+    await ReportController.create_report(data2, session)
+    await ReportController.create_report(data3, session)
+    # Ejecuta el filtro
+    reports = await ReportController.get_by_action("action-1", session)
+    assert isinstance(reports, list)
+    assert len(reports) == 2
+    assert all(r.id_action == "action-1" for r in reports)
+
+@pytest.mark.asyncio
 async def test_get_all_reports(session):
     data1 = get_report_data("action-1")
     data2 = get_report_data("action-2")

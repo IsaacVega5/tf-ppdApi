@@ -24,6 +24,19 @@ def get_mock_report(id_action=None):
         id_action=id_action or str(uuid4())
     )
 
+def test_get_reports_by_action(mocker, client):
+    mock_data = [
+        get_mock_report("action-1"),
+        get_mock_report("action-1")
+    ]
+    mocker.patch.object(ReportController, "get_by_action", return_value=mock_data)
+    response = client.get("/report/action/action-1")
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert isinstance(data, list)
+    assert all(report["id_action"] == "action-1" for report in data)
+    assert len(data) == 2
+
 def test_get_all_reports(mocker, client):
     mock_data = [
         get_mock_report("action-1"),

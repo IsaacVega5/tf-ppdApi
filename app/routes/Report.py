@@ -31,6 +31,22 @@ async def get_reports(session=Depends(get_session)):
     return await ReportController.get_all(session)
 
 @router.get(
+    "/action/{id_action}",
+    response_model=List[Report],
+    summary="Get reports by action ID",
+    description="""Retrieves all reports associated with a specific action ID.\n\nArgs:\n    id_action (str): The action ID to filter reports.\n\nReturns:\n    List of Report objects.""",
+    response_description="List of reports filtered by action ID"
+)
+async def get_reports_by_action(id_action: str, session=Depends(get_session)):
+    """
+    Get all reports by action ID.
+    Args:
+        id_action (str): The action ID to filter reports.
+    Returns a list of reports associated with the given action.
+    """
+    return await ReportController.get_by_action(id_action, session)
+
+@router.get(
     "/{id}",
     response_model=Report,
     summary="Get report by ID",

@@ -1,6 +1,6 @@
 import pytest
 from sqlmodel import SQLModel, Session, create_engine
-from app.controllers.DeadLineController import DeadLineController
+from app.controllers import DeadLineController
 from app.models.DeadLine import DeadLineBase
 from fastapi import HTTPException, status
 from datetime import datetime

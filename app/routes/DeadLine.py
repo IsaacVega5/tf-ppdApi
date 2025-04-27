@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from typing import List
 from app.db import get_session
 from app.models.DeadLine import DeadLine, DeadLineBase
-from app.controllers.DeadLineController import DeadLineController
+from app.controllers import DeadLineController
 from app.utils.auth import verify_access_token
 
 router = APIRouter(
@@ -31,6 +31,64 @@ async def get_deadlines(session=Depends(get_session)):
         List of DeadLine objects.
     """
     return await DeadLineController.get_all(session)
+
+@router.get(
+    "/action/{id_action}",
+    response_model=List[DeadLine],
+    summary="Get deadlines by action ID",
+    response_description="List of deadlines filtered by action ID"
+)
+async def get_deadlines_by_action(id_action: str, session=Depends(get_session)):
+    """
+    Get all deadlines by action ID.
+    Args:
+        id_action (str): The action ID to filter deadlines.
+    Returns a list of deadlines associated with the given action.
+    """
+    return await DeadLineController.get_by_action(id_action, session)
+
+@router.get(
+    "/date-range",
+    response_model=List[DeadLine],
+    summary="Get deadlines by date range",
+    response_description="List of deadlines filtered by date range"
+)
+async def get_deadlines_by_date_range(from_date: str, to_date: str, session=Depends(get_session)):
+    """
+    Get all deadlines between two dates (inclusive).
+    Args:
+        from_date (str): Start date (YYYY-MM-DD).
+        to_date (str): End date (YYYY-MM-DD).
+    Returns a list of deadlines in the date range.
+    """
+    from datetime import datetime
+    from_dt = datetime.fromisoformat(from_date)
+    to_dt = datetime.fromisoformat(to_date)
+    return await DeadLineController.get_by_date_range(from_dt, to_dt, session)
+
+@router.get(
+    "/active",
+    response_model=List[DeadLine],
+    summary="Get active deadlines",
+    response_description="List of active deadlines (future or today)"
+)
+async def get_active_deadlines(session=Depends(get_session)):
+    """
+    Get all active deadlines (deadline_date >= today).
+    """
+    return await DeadLineController.get_active(session)
+
+@router.get(
+    "/inactive",
+    response_model=List[DeadLine],
+    summary="Get inactive deadlines",
+    response_description="List of inactive deadlines (past)"
+)
+async def get_inactive_deadlines(session=Depends(get_session)):
+    """
+    Get all inactive deadlines (deadline_date < today).
+    """
+    return await DeadLineController.get_inactive(session)
 
 @router.get(
     "/{id}",
