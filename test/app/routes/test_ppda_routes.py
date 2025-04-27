@@ -5,15 +5,20 @@ from datetime import datetime
 from uuid import uuid4
 from app.main import app
 from app.controllers import PpdaController, InstitutionController
+from app.models import User, UserInstitution
 from app.models.Ppda import PpdaCreate, PpdaUpdate, Ppda
-from app.utils.auth import verify_access_token
+from app.utils.auth import verify_access_token, get_admin_user, get_current_user
+import app.routes.Ppda as ppda_routes
 
 @pytest.fixture(autouse=True)
 def override_auth_dependency():
     # Override para bypassear la autenticación
     app.dependency_overrides[verify_access_token] = lambda: True
+    test_user = User(id="test-id", username="test")
+    app.dependency_overrides[get_admin_user] = lambda: test_user
+    app.dependency_overrides[get_current_user] = lambda: test_user
     yield
-    app.dependency_overrides = {}
+    app.dependency_overrides.clear()
 
 @pytest.fixture
 def client():
@@ -44,6 +49,7 @@ def test_get_all_ppda(mocker, client):
 def test_get_ppda_by_id(mocker, client):
     mock_data = get_mock_ppda("68d5412b-29d7-40ef-b234-64a5f55b5497")
     mocker.patch.object(PpdaController, "get_by_id", return_value=mock_data)
+    mocker.patch.object(ppda_routes, "verify_institution_role", return_value=True)
 
     response = client.get(f"/ppda/{mock_data.id_ppda}")
 
@@ -66,11 +72,12 @@ def test_create_ppda(mocker, client):
     mocker.patch.object(
         InstitutionController, 
         "get_by_id", 
-        return_value={"id_institution": institution_id}
+        return_value=UserInstitution(id_institution=institution_id) #{"id_institution": institution_id}
     )
     
     created_data = get_mock_ppda(institution_id)
     mocker.patch.object(PpdaController, "create_ppda", return_value=created_data)
+    mocker.patch.object(ppda_routes,"verify_institution_role",return_value=True)
 
     response = client.post("/ppda/", json=new_data.model_dump())
 
@@ -112,6 +119,12 @@ def test_update_ppda(mocker, client):
         PpdaController, 
         "update_ppda", 
         return_value=response_data
+    )
+
+    mocker.patch.object(
+        ppda_routes,
+        "verify_institution_role",
+        return_value=True
     )
 
     response = client.put(

@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 import sqlmodel as sql
 
 from app.controllers import InstitutionController, UserController
-from app.models import UserInstitution, UserRol, UserInstitutionPublic, UserInstitutionCreate, UserInstitutionUpdate
+from app.models import UserInstitution, UserInstitutionPublic, UserInstitutionCreate, UserInstitutionUpdate
 
 async def get_all(session : sql.Session):
   """
@@ -16,10 +16,7 @@ async def get_all(session : sql.Session):
       List[UserInstitutionPublic]: A list of user-institution records with their
           respective user roles
   """
-  statement = sql.select(
-    UserInstitution,
-    UserRol
-  ).join(UserRol)
+  statement = sql.select(UserInstitution)
   user_institution_list = session.exec(statement).all()
   if not user_institution_list:
     return []
@@ -28,8 +25,8 @@ async def get_all(session : sql.Session):
       id_user = user_intitution.id_user,
       id_institution = user_intitution.id_institution,
       is_active = user_intitution.is_active,
-      user_rol = user_rol.user_rol_name
-    ) for (user_intitution, user_rol) in user_institution_list
+      role = user_intitution.role
+    ) for (user_intitution) in user_institution_list
   ]
   return user_institution_list
 
@@ -59,17 +56,15 @@ async def get_by_ids(id_user : str, id_institution : str, session : sql.Session)
   
   statement = sql.select(
     UserInstitution,
-    UserRol
-  ).where(UserInstitution.id_user == id_user).where(UserInstitution.id_institution == id_institution).join(UserRol)
-  res = session.exec(statement).first()
-  if not res:
+  ).where(UserInstitution.id_user == id_user).where(UserInstitution.id_institution == id_institution)
+  user_institution = session.exec(statement).first()
+  if not user_institution:
     return None
-  (user_institution, user_rol) = res
   user_institution = UserInstitutionPublic(
     id_user = user_institution.id_user,
     id_institution = user_institution.id_institution,
     is_active = user_institution.is_active,
-    user_rol = user_rol.user_rol_name
+    role = user_institution.role
   )
   return user_institution
 
@@ -89,18 +84,15 @@ async def get_by_user(id_user : str, session : sql.Session):
       List[UserInstitutionPublic]: A list of user-institution records with their
           respective user roles
   """
-  statement = sql.select(
-    UserInstitution,
-    UserRol
-  ).where(UserInstitution.id_user == id_user).join(UserRol)
+  statement = sql.select(UserInstitution).where(UserInstitution.id_user == id_user)
   user_institution_list = session.exec(statement).all()
   user_institution_list = [
     UserInstitutionPublic(
       id_user = user_intitution.id_user,
       id_institution = user_intitution.id_institution,
       is_active = user_intitution.is_active,
-      user_rol = user_rol.user_rol_name
-    ) for (user_intitution, user_rol) in user_institution_list
+      role = user_intitution.role
+    ) for (user_intitution) in user_institution_list
   ]
   return user_institution_list
 
@@ -128,18 +120,15 @@ async def get_by_institution(id_institution : str, session : sql.Session):
   if not institution:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Institution not found")
   
-  statement = sql.select(
-    UserInstitution,
-    UserRol
-  ).where(UserInstitution.id_institution == id_institution).join(UserRol)
+  statement = sql.select(UserInstitution).where(UserInstitution.id_institution == id_institution)
   user_institution_list = session.exec(statement).all()
   user_institution_list = [
     UserInstitutionPublic(
       id_user = user_intitution.id_user,
       id_institution = user_intitution.id_institution,
       is_active = user_intitution.is_active,
-      user_rol = user_rol.user_rol_name
-    ) for (user_intitution, user_rol) in user_institution_list
+      role = user_intitution.user_rol_name
+    ) for (user_intitution) in user_institution_list
   ]
   return user_institution_list
 
