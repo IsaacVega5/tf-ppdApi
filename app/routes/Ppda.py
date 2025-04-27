@@ -5,7 +5,7 @@ from slowapi.util import get_remote_address
 from typing import List
 
 from app.db import get_session
-from app.models import Ppda, PpdaCreate, PpdaUpdate, User
+from app.models import Ppda, PpdaCreate, PpdaUpdate, User, Role
 from app.controllers import InstitutionController, PpdaController
 from app.utils.auth import get_admin_user, get_current_user
 from app.utils.rbac import verify_institution_role
@@ -74,8 +74,8 @@ async def get_ppda_by_id(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ppda not found")
 
   verify_institution_role(
-    institution_id=ppda.id_institution,
-    required_role="viewer",
+    institution_ids=[ppda.id_institution],
+    required_role=Role.VIEWER,
     current_user=user,
     session=session
   )
@@ -119,8 +119,8 @@ async def create_ppda(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Institution not found")
   
   verify_institution_role(
-    institution_id=institution.id_institution,
-    required_role="editor",
+    institution_ids=[institution.id_institution],
+    required_role=Role.EDITOR,
     current_user=user,
     session=session
   )
@@ -169,9 +169,9 @@ async def update_ppda(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Institution not found")
   
   verify_institution_role(
-    institution_id=[ppda.id_institution, ppda_db.id_institution],
+    institution_ids=[ppda.id_institution, ppda_db.id_institution],
     current_user=user,
-    required_role="editor",
+    required_role=Role.EDITOR,
     session=session
   )
   

@@ -1,5 +1,8 @@
 from typing import TYPE_CHECKING, Optional
 from sqlmodel import Field, Relationship, SQLModel
+from app.models.Role import Role
+from sqlalchemy import Column
+from sqlalchemy.types import Enum as SAEnum
 
 if TYPE_CHECKING: from app.models import User, Institution, UserRol
 
@@ -18,7 +21,13 @@ class UserInstitutionBase(SQLModel):
   """
   id_user : Optional[str] = Field(default=None, foreign_key="user.id_user", primary_key=True)
   id_institution : Optional[str] = Field(default=None, foreign_key="institution.id_institution", primary_key=True)
-  id_user_rol : Optional[int] = Field(default=None, foreign_key="user_rol.id_user_rol")
+  role: Role = Field(
+    sa_column=Column(
+      SAEnum(Role, name="role_enum", native_enum=True),
+      nullable=False,
+      default=Role.VIEWER,
+    )
+  )
   is_active : bool = Field(default=True, nullable=False)
   
 class UserInstitution(UserInstitutionBase, table=True):
@@ -42,7 +51,6 @@ class UserInstitution(UserInstitutionBase, table=True):
   
   user : "User" = Relationship(back_populates="user_institution_user")
   institution_user_institution : "Institution" = Relationship(back_populates="user_institution_institution")
-  user_rol : Optional["UserRol"] = Relationship(back_populates="user_institution_user_rol")
 
 class UserInstitutionPublic(UserInstitutionBase):
   """
@@ -55,7 +63,7 @@ class UserInstitutionPublic(UserInstitutionBase):
   id_user : Optional[str]
   id_institution : Optional[str]
   is_active : Optional[bool]
-  user_rol : Optional[str]
+  role : Optional[Role]
 
 class UserInstitutionCreate(UserInstitutionBase):
   """
@@ -68,7 +76,7 @@ class UserInstitutionCreate(UserInstitutionBase):
   """
   id_user : Optional[str]
   id_institution : Optional[str]
-  id_user_rol : Optional[int]
+  role : Role
 
 class UserInstitutionUpdate(UserInstitutionBase):
   """
@@ -82,5 +90,5 @@ class UserInstitutionUpdate(UserInstitutionBase):
   """
   id_user : Optional[str]
   id_institution : Optional[str]
-  id_user_rol : Optional[int] = None
+  role : Optional[Role]
   is_active : Optional[bool] = None
