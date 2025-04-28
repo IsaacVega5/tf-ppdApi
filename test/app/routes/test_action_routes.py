@@ -52,7 +52,6 @@ def test_get_action_by_id(mocker, client):
   mocker.patch("app.utils.rbac.verify_institution_role", return_value=True)
   
   response = client.get("/action/uuid_action_1")
-  print("response: ", response.json(), "\n\n\n\n")
   assert response.status_code == status.HTTP_200_OK
   assert response.json() == mock_data_action
 
