@@ -60,11 +60,14 @@ async def get_action_type( session = Depends(get_session)):
 )
 async def get_action_type_by_id(id_action_type: int, session = Depends(get_session)):
   action_type = await ActionTypeController.get_by_id(id_action_type, session)
+  if action_type is None:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Action type not found")
   return action_type
 
 @router.post(
   "/",
   response_model=ActionType,
+  status_code=status.HTTP_201_CREATED,
   summary="Create a new action type",
   description="""
   Creates a new action type in the system.
