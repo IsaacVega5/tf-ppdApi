@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from typing import List
 from app.db import get_session
-from app.models.Kpi import Kpi
+from app.models.Kpi import Kpi, KpiBase
 from app.controllers import KpiController
 from app.utils.auth import verify_access_token
 
@@ -40,11 +40,11 @@ async def get_kpi_by_id(id: str, session=Depends(get_session)):
     return await KpiController.get_kpi_by_id(id, session)
 
 @router.post("/", response_model=Kpi, status_code=status.HTTP_201_CREATED, summary="Create a new KPI")
-async def create_kpi(kpi: Kpi, session=Depends(get_session)):
+async def create_kpi(kpi: KpiBase, session=Depends(get_session)):
     """
     Create a new KPI record.
     Args:
-        kpi (Kpi): Data for the new KPI.
+        kpi (KpiBase): Data for the new KPI.
         session: Database session dependency.
     Returns:
         The newly created KPI object.
@@ -52,12 +52,12 @@ async def create_kpi(kpi: Kpi, session=Depends(get_session)):
     return await KpiController.create_kpi(kpi, session)
 
 @router.put("/{id}", response_model=Kpi, summary="Update KPI by ID")
-async def update_kpi(id: str, kpi: Kpi, session=Depends(get_session)):
+async def update_kpi(id: str, kpi: KpiBase, session=Depends(get_session)):
     """
     Update an existing KPI record by its ID.
     Args:
         id (str): UUID of the KPI to update.
-        kpi (Kpi): New data for the KPI.
+        kpi (KpiBase): New data for the KPI.
         session: Database session dependency.
     Returns:
         The updated KPI object if found.

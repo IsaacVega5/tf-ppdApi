@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from typing import List
 from app.db import get_session
-from app.models.Report import Report
+from app.models.Report import Report, ReportBase
 from app.controllers import ReportController
 from app.utils.auth import verify_access_token
 
@@ -67,14 +67,14 @@ async def get_report(id: str, session=Depends(get_session)):
     response_model=Report,
     status_code=status.HTTP_201_CREATED,
     summary="Create report",
-    description="""Creates a new report.\n\nArgs:\n    report (Report): The report data to create.\n\nReturns:\n    The newly created report.""",
+    description="""Creates a new report.\n\nArgs:\n    report (ReportBase): The report data to create.\n\nReturns:\n    The newly created report.""",
     response_description="The newly created report"
 )
-async def create_report(report: Report, session=Depends(get_session)):
+async def create_report(report: ReportBase, session=Depends(get_session)):
     """
     Create a new report.
     Args:
-        report (Report): The report data to create.
+        report (ReportBase): The report data to create.
     Returns the newly created report.
     """
     return await ReportController.create_report(report, session)
@@ -83,15 +83,15 @@ async def create_report(report: Report, session=Depends(get_session)):
     "/{id}",
     response_model=Report,
     summary="Update report",
-    description="""Updates an existing report by its ID.\n\nArgs:\n    id (str): The UUID of the report to update.\n    report (Report): The new data for the report.\n\nReturns:\n    The updated report if found, otherwise raises 404.""",
+    description="""Updates an existing report by its ID.\n\nArgs:\n    id (str): The UUID of the report to update.\n    report (ReportBase): The new data for the report.\n\nReturns:\n    The updated report if found, otherwise raises 404.""",
     response_description="The updated report"
 )
-async def update_report(id: str, report: Report, session=Depends(get_session)):
+async def update_report(id: str, report: ReportBase, session=Depends(get_session)):
     """
     Update an existing report by its ID.
     Args:
         id (str): The UUID of the report to update.
-        report (Report): The new data for the report.
+        report (ReportBase): The new data for the report.
     Returns the updated report if found, otherwise raises 404.
     """
     return await ReportController.update_report(id, report, session)
