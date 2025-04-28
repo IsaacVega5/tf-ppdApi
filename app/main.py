@@ -9,7 +9,6 @@ from starlette.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 
-from app.routes import InstitutionType, User, Institution, Ppda, Auth, UserInstitution, Report, DeadLine, History, ActionType, Action
 from app.routes import InstitutionType, User, Institution, Ppda, Auth, UserInstitution, Report, DeadLine, History, Kpi, Variable, ActionType, Action
 from app.utils.docs import tags_metadata
 from app.db import init_db
