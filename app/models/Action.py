@@ -40,3 +40,38 @@ class Action(ActionBase, table=True):
     kpi_list : list["Kpi"] = Relationship(back_populates="action")
     report : Optional["Report"] = Relationship(back_populates="report_action")
     user: Optional["User"] = Relationship(back_populates="actions")
+
+class ActionCreate(ActionBase):
+    """Model for creating new actions.
+    
+    Inherits from ActionBase and is used for creating new action instances.
+    
+    Attributes:
+        id_ppda (Optional[str]): Foreign key referencing the PPDA this action belongs to
+        id_action_type (Optional[int]): Foreign key referencing the type of action
+    """
+    id_ppda : Optional[str]
+    id_action_type: Optional[int]
+
+class ActionUpdate(SQLModel):
+    """Model for updating existing actions.
+    
+    Inherits from SQLModel and is used for updating existing action instances.
+    
+    Attributes:
+        id_ppda (Optional[str]): Foreign key referencing the PPDA this action belongs to
+        id_action_type (Optional[int]): Foreign key referencing the type of action
+    """
+    id_ppda : Optional[str]
+    id_action_type: Optional[int]
+    id_user : Optional[str]
+
+class ActionPublic(SQLModel):
+    """Model for public representation of actions.
+    
+    Attributes:
+        id_ppda (Optional[str]): Foreign key referencing the PPDA this action belongs to
+        action_type (Optional[str]): Type of action being performed
+    """
+    id_ppda : Optional[str]
+    action_type : Optional[str]
