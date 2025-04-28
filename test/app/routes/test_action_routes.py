@@ -100,7 +100,7 @@ def test_delete_action_not_found(mocker, client):
   mocker.patch.object(ActionController, "delete_action", return_value=None)
   mocker.patch("app.utils.rbac.verify_institution_role", return_value=True)
   
-  response = client.delete("/action/999")
+  response = client.delete("/action/uuid_action_1")
 
   assert response.status_code == status.HTTP_404_NOT_FOUND
   assert response.json() == {"detail": "Action not found"}
