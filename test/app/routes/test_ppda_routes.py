@@ -25,7 +25,7 @@ def client():
     return TestClient(app)
 
 def get_mock_ppda(id_institution=None):
-    now = datetime.now().isoformat()
+    now = int(datetime.now().timestamp())
     return Ppda(
         id_ppda=str(uuid4()),
         id_institution=id_institution or str(uuid4()),

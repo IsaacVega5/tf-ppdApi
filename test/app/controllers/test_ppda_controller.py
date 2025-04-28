@@ -20,14 +20,20 @@ def session_fixture():
 
 @pytest.fixture
 def sample_institution(session):
-    institution = Institution(id_institution="inst-1", name="Institución Test")
+    institution = Institution(
+        id_institution="inst-1",
+        name="Institución Test"
+    )
     session.add(institution)
     session.commit()
     return institution
 
 @pytest.fixture
 def sample_ppda_data(sample_institution):
-    return PpdaCreate(id_institution=sample_institution.id_institution)
+    return PpdaCreate(
+        id_institution=sample_institution.id_institution,
+        name="Test ppda",
+    )
 
 @pytest.mark.asyncio
 async def test_create_ppda_success(session, sample_ppda_data):
@@ -58,7 +64,7 @@ async def test_get_by_id_not_found(session):
 
 @pytest.mark.asyncio
 async def test_update_ppda_success(session, sample_institution):
-    ppda = await create_ppda(PpdaCreate(id_institution=sample_institution.id_institution), session)
+    ppda = await create_ppda(PpdaCreate(id_institution=sample_institution.id_institution, name="Test ppda"), session)
     ppda.id_institution = sample_institution.id_institution
     updated = await update_ppda(ppda, session)
     assert updated.id_ppda == ppda.id_ppda

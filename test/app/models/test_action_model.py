@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlmodel import Session, SQLModel, create_engine
 from app.models.Action import Action, ActionBase
 from app.models import ActionType, Ppda
+from app.models.PpdaStatus import PpdaStatus
 
 # Fixtures para datos de prueba
 @pytest.fixture
@@ -146,7 +147,12 @@ class TestActionDB:
         
         # Crear registros relacionados
         action_type = ActionType(id_action_type=1, action_type="Test")
-        ppda = Ppda(id_ppda="PPDA-2023-001") 
+        ppda = Ppda(
+            id_ppda="PPDA-2023-001",
+            id_institution=None,
+            name="Test PPDA",
+            status=PpdaStatus.DRAFT,
+        )
         
         self.session.add_all([action_type, ppda])
         self.session.commit()
