@@ -1,9 +1,24 @@
 import pytest
 from fastapi.testclient import TestClient
 from fastapi import status
-from app.main import app
-from app.controllers import InstitutionController
+import os
+from unittest.mock import patch
+from sqlmodel import SQLModel, create_engine
+
+os.environ["DATABASE"] = "sqlite"
+test_engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+
+def get_test_session():
+    from sqlmodel import Session
+    with Session(test_engine) as session:
+        yield session
+
+with patch('app.db.engine', test_engine), patch('app.db.get_session', get_test_session):
+    from app.main import app
+    SQLModel.metadata.create_all(test_engine)
+
 from app.models.Institution import InstitutionCreate, InstitutionUpdate
+from app.controllers import InstitutionController
 from app.controllers import InstitutionTypeController
 from app.utils.auth import get_admin_user
 

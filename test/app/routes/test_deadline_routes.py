@@ -1,11 +1,28 @@
 import pytest
 from fastapi.testclient import TestClient
 from fastapi import status, HTTPException
+import os
+from unittest.mock import patch
+from sqlmodel import SQLModel, create_engine
 from uuid import uuid4
-from app.main import app
+
+os.environ["DATABASE"] = "sqlite"
+test_engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+
+def get_test_session():
+    from sqlmodel import Session
+    with Session(test_engine) as session:
+        yield session
+
+with patch('app.db.engine', test_engine), patch('app.db.get_session', get_test_session):
+    from app.main import app
+    SQLModel.metadata.create_all(test_engine)
+
 from app.models.DeadLine import DeadLine
 from app.controllers import DeadLineController
 from app.utils.auth import verify_access_token
+from datetime import datetime
+import uuid
 
 @pytest.fixture(autouse=True)
 def override_auth_dependency():
