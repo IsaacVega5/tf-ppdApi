@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from fastapi import status
+from fastapi import HTTPException, status
 from app.main import app
 from app.controllers import ActionController, PpdaController
 from app.models.Action import *
@@ -97,7 +97,7 @@ def test_delete_action(mocker, client):
   assert response.json() == {"message": "Action uuid_action_1 deleted"}
 
 def test_delete_action_not_found(mocker, client):
-  mocker.patch.object(ActionController, "delete_action", return_value=None)
+  mocker.patch.object(ActionController, "delete_action", side_effect=HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Action not found"))
   mocker.patch("app.utils.rbac.verify_institution_role", return_value=True)
   
   response = client.delete("/action/uuid_action_1")
