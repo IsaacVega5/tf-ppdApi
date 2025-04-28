@@ -46,6 +46,8 @@ app.include_router(DeadLine.router)
 app.include_router(History.router)
 app.include_router(Kpi.router)
 app.include_router(Variable.router)
+app.include_router(ActionType.router)
+app.include_router(Action.router)
 
 
 # this defines a max; if a router sets a limit less than this one, then
